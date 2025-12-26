@@ -1,0 +1,31 @@
+@startuml
+[*] --> DarkMode : runDark
+
+state DarkMode
+state Activated
+state Canary
+
+DarkMode --> Activated : activate
+DarkMode --> Canary : rolloutCanary
+Activated --> DarkMode : deactivate
+Activated --> Canary : rolloutCanary
+BlueGreen --> Canary : rolloutCanary
+Canary --> Canary : setWeights
+Activated --> BlueGreen : switchBlueGreen
+BlueGreen --> BlueGreen : switchBlueGreen
+Activated --> DarkMode : resetLabels
+BlueGreen --> DarkMode : resetLabels
+Canary --> DarkMode : resetLabels
+
+DarkMode --> [*] : runDark_0
+Activated --> [*] : runDark_0
+BlueGreen --> [*] : runDark_0
+Canary --> [*] : runDark_0
+
+legend right
+As ações/transições:
+ - inspectLabels (apresenta os labels de Traefik de cada serviço)
+ - 100Requests (executa 100 pedidos ao endpoint /actuator/info)
+São executáveis em qualquer estado/modo, e não alteram o estado.
+end legend
+@enduml
