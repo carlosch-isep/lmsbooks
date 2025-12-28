@@ -20,14 +20,13 @@
 		<maven.compiler.target>21</maven.compiler.target>
 		<maven.compiler.release>21</maven.compiler.release>
 
-		<skipTests>false</skipTests>
-		<skipIT>false</skipIT>
+		<skipUTs>false</skipUTs>
+		<skipITs>false</skipITs>
 
 		<!-- automatically run annotation processors within the incremental compilation -->
 		<m2e.apt.activation>jdt_apt</m2e.apt.activation>
 
 		<spring-cloud-contract.version>4.1.4</spring-cloud-contract.version>
-
 
 		<PACT_FOLDER>./target/pacts</PACT_FOLDER>
 
@@ -272,21 +271,21 @@
 				</configuration>
 			</plugin>
 
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-surefire-plugin</artifactId>
-			<version>3.0.0-M9</version>
-			<configuration>
-				<skipTests>${skipTests}</skipTests>
-			</configuration>
-		</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M9</version>
+				<configuration>
+					<skipTests>${skipUTs}</skipTests>
+				</configuration>
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>3.0.0-M9</version>
 				<configuration>
-					<skipTests>${skipIT}</skipTests>
+					<skipTests>${skipITs}</skipTests>
 				</configuration>
 				<executions>
 					<execution>
