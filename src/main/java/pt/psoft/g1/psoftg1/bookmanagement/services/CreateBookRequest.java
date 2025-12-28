@@ -17,6 +17,9 @@ import java.util.List;
 public class CreateBookRequest {
 
     @Setter
+    private String isbn;
+
+    @Setter
     private String description;
 
     @NotBlank

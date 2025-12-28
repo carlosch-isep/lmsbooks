@@ -89,4 +89,16 @@ public class SagaService {
         return sagaRepository.findByObjectClassAndStatus(objectClass, status).stream().map(SagaEntity::toDomain).toList();
     }
 
+    @Transactional
+    public void saveSaga(Saga saga) {
+        SagaEntity entity = new SagaEntity(saga);
+        sagaRepository.save(entity).toDomain();
+    }
+
+    @Transactional
+    public void updateSaga(Saga saga) {
+        SagaEntity entity = new SagaEntity(saga);
+        sagaRepository.save(entity).toDomain();
+    }
+
 }
