@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-@Profile("mongodb")
+@Profile("command")
 public class AuthorMongo implements Serializable {
     private String id;
     private String name;
@@ -18,4 +18,3 @@ public class AuthorMongo implements Serializable {
         this.name = name;
     }
 }
-

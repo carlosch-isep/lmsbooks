@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pt.psoft.g1.psoftg1.bookmanagement.model.Book;
-import pt.psoft.g1.psoftg1.bookmanagement.services.BookService;
-import pt.psoft.g1.psoftg1.bookmanagement.services.CreateBookRequest;
-import pt.psoft.g1.psoftg1.bookmanagement.services.SearchBooksQuery;
-import pt.psoft.g1.psoftg1.bookmanagement.services.UpdateBookRequest;
-import pt.psoft.g1.psoftg1.exceptions.ConflictException;
+import pt.psoft.g1.psoftg1.bookmanagement.services.*;
 import pt.psoft.g1.psoftg1.exceptions.NotFoundException;
 import pt.psoft.g1.psoftg1.shared.api.ListResponse;
 import pt.psoft.g1.psoftg1.shared.services.ConcurrencyService;
@@ -33,13 +30,16 @@ import java.util.stream.Collectors;
 
 @Tag(name = "Books", description = "Endpoints for managing Books")
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/books")
+@RequiredArgsConstructor
 public class BookController {
-    private final BookService bookService;
+    // Inject both services as optional beans
+    @Autowired(required = false)
+    private BookMongoService bookCommandService;
+    @Autowired(required = false)
+    private BookServiceImpl bookQueryService;
     private final ConcurrencyService concurrencyService;
     private final FileStorageService fileStorageService;
-
     private final BookViewMapper bookViewMapper;
 
     @Operation(summary = "Register a new Book")
@@ -58,10 +58,10 @@ public class BookController {
         }
 
         Book book;
-        try {
-            book = bookService.create(resource, isbn);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (bookCommandService != null) {
+            book = bookCommandService.create(resource, isbn);
+        } else {
+            throw new IllegalStateException("Command service not available");
         }
         // final var savedBook = bookService.save(book);
         final var newBookUri = ServletUriComponentsBuilder.fromCurrentRequestUri().pathSegment(book.getIsbn()).build()
@@ -92,11 +92,10 @@ public class BookController {
 
         Book book;
         resource.setIsbn(isbn);
-        try {
-            book = bookService.update(resource,
-                    concurrencyService.getVersionFromIfMatchHeader(ifMatchValue));
-        } catch (Exception e) {
-            throw new ConflictException("Could not update book: " + e.getMessage());
+        if (bookCommandService != null) {
+            book = bookCommandService.update(resource, concurrencyService.getVersionFromIfMatchHeader(ifMatchValue));
+        } else {
+            throw new IllegalStateException("Command service not available");
         }
         return ResponseEntity.ok().eTag(Long.toString(book.getVersion())).body(bookViewMapper.toBookView(book));
     }
@@ -106,21 +105,21 @@ public class BookController {
     public ListResponse<BookView> findBooks(@RequestParam(value = "title", required = false) final String title,
                                             @RequestParam(value = "genre", required = false) final String genre,
                                             @RequestParam(value = "authorName", required = false) final String authorName) {
-
+        if (bookQueryService == null) throw new IllegalStateException("Query service not available");
         // Este método, como está, faz uma junção 'OR'.
         // Para uma junção 'AND', ver o "/search"
 
         List<Book> booksByTitle = null;
         if (title != null)
-            booksByTitle = bookService.findByTitle(title);
+            booksByTitle = bookQueryService.findByTitle(title);
 
         List<Book> booksByGenre = null;
         if (genre != null)
-            booksByGenre = bookService.findByGenre(genre);
+            booksByGenre = bookQueryService.findByGenre(genre);
 
         List<Book> booksByAuthorName = null;
         if (authorName != null)
-            booksByAuthorName = bookService.findByAuthorName(authorName);
+            booksByAuthorName = bookQueryService.findByAuthorName(authorName);
 
         Set<Book> bookSet = new HashSet<>();
         if (booksByTitle != null)
@@ -142,8 +141,8 @@ public class BookController {
     @Operation(summary = "Gets a specific Book by isbn")
     @GetMapping(value = "/{isbn}")
     public ResponseEntity<BookView> findByIsbn(@PathVariable final String isbn) {
-
-        final var book = bookService.findByIsbn(isbn);
+        if (bookQueryService == null) throw new IllegalStateException("Query service not available");
+        final var book = bookQueryService.findByIsbn(isbn);
 
         BookView bookView = bookViewMapper.toBookView(book);
 
@@ -154,8 +153,8 @@ public class BookController {
     @GetMapping("/{isbn}/photo")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<byte[]> getSpecificBookPhoto(@PathVariable("isbn") final String isbn) {
-
-        Book book = bookService.findByIsbn(isbn);
+        if (bookQueryService == null) throw new IllegalStateException("Query service not available");
+        Book book = bookQueryService.findByIsbn(isbn);
 
         // In case the user has no photo, just return a 200 OK without body
         if (book.getPhoto() == null) {
@@ -179,21 +178,22 @@ public class BookController {
     @Operation(summary = "Deletes a book photo")
     @DeleteMapping("/{isbn}/photo")
     public ResponseEntity<Void> deleteBookPhoto(@PathVariable("isbn") final String isbn) {
-
-        var book = bookService.findByIsbn(isbn);
+        if (bookQueryService == null || bookCommandService == null) throw new IllegalStateException("Required service not available");
+        var book = bookQueryService.findByIsbn(isbn);
         if (book.getPhoto() == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         fileStorageService.deleteFile(book.getPhoto().getPhotoFile());
-        bookService.removeBookPhoto(book.getIsbn(), book.getVersion());
+        bookCommandService.removeBookPhoto(book.getIsbn(), book.getVersion());
 
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/search")
     public ListResponse<BookView> searchBooks(@RequestBody final SearchRequest<SearchBooksQuery> request) {
-        final var bookList = bookService.searchBooks(request.getPage(), request.getQuery());
+        if (bookQueryService == null) throw new IllegalStateException("Query service not available");
+        final var bookList = bookQueryService.searchBooks(request.getPage(), request.getQuery());
         return new ListResponse<>(bookViewMapper.toBookView(bookList));
     }
 }

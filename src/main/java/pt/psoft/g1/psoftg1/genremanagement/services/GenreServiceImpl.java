@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Profile("postgres")
+@Profile("query")
 @RequiredArgsConstructor
 public class GenreServiceImpl implements GenreService {
 

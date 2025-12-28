@@ -10,7 +10,7 @@ import pt.psoft.g1.psoftg1.authormanagement.repository.AuthorMongoRepository;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ActiveProfiles("mongodb")
+@ActiveProfiles("command")
 class AuthorMongoServiceIntegrationTest {
     @Autowired
     private AuthorMongoService authorMongoService;

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Profile("postgres")
+@Profile("query")
 @RequiredArgsConstructor
 @PropertySource({ "classpath:config/library.properties" })
 public class BookServiceImpl implements BookService {

@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-@Profile("mongodb")
+@Profile("command")
 @Document(collection = "saga")
 public class SagaMongo implements Serializable {
     @Id
@@ -33,4 +33,3 @@ public class SagaMongo implements Serializable {
         this.version = version;
     }
 }
-

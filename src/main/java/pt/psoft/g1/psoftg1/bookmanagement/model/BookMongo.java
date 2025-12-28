@@ -14,7 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Profile("mongodb")
+@Profile("command")
 @Document(collection = "book")
 public class BookMongo {
     @Id

@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Profile;
 
 @Getter
 @Setter
-@Profile("mongodb")
+@Profile("command")
 public class GenreMongo implements Serializable {
     private String id;
     private String name;
@@ -22,9 +22,3 @@ public class GenreMongo implements Serializable {
 
     }
 }
-
-
-
-
-
-

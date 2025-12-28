@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Profile("mongodb")
+@Profile("command")
 public class AuthorMongoService implements AuthorService {
     @Autowired
     private AuthorMongoRepository authorMongoRepository;
