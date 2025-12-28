@@ -72,6 +72,8 @@ Can be found in test/pt/psoft/gq/pgsoftg1/sagamanagement/services/SagaServiceInt
 
 #### Consumer-Driven Contract Tests
 
+Can be found int test/java/CDC
+
 #### Container image build
 
 With Dockerfile and Docker-compose files provided.
@@ -103,14 +105,25 @@ Available in the root project
 #### Deploy the system on a remote Docker server (DEI virtual servers or other cloud/remote server)
 
 #### Load tests in staging
-
-Using k6
+The following test are execute in the staging environment using k6:
+```bash
+  k6 run --vus 100 --duration 30s load-tests/get-books.js
+  k6 run --vus 100 --duration 30s load-tests/create-book.js
+  k6 run --vus 100 --duration 30s load-tests/mixed-scenario.js
+```
 
 #### Scale services via scripts based on load-test results
+TODO
 
 #### Smoke tests in dev and staging environments
+The same load test executed in dev and staging environments are also used as smoke tests, but with reduced load:
+```bash
+  k6 run load-tests/smoke/get-books-smoke.js
+  k6 run load-tests/smoke/create-book-smoke.js
+```
 
 #### Health checks in prod environments
+Traefik is configured to perform health checks on the service instances to ensure they are running and responsive.
 
 #### Adopt at least one rollout strategy per student: canary, blue/green or (for groups of 3) or rolling update
 

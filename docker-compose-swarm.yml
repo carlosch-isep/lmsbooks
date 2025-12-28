@@ -26,9 +26,6 @@ services:
     deploy:
       replicas: 2
     ports:
-#      - "5432:5432"  # Default Postgres port for the first replica
-#      - "5433:5432"  # Postgres port for the second replica
-#      - "5434:5432"  # Postgres port for the third replica
       - "5432-5450:5432"
 
     networks:
@@ -52,6 +49,7 @@ services:
 networks:
   lms_network:
     driver: overlay
+    attachable: true
 
 volumes:
   uploaded_files_volume_1:
