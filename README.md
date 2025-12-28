@@ -148,3 +148,18 @@ Traefik can be configured to route traffic based on specific conditions, allowin
 #### Adopt at least one release strategy per student: Internal/Beta Access, Gradual Release, A/B Testing
 
 In the Traefik configuration, we can set up rules to route a portion of the traffic to the new version of the service (Gradual Release) or to different versions based on user attributes (A/B Testing).
+
+## Running All Tests with Profiles
+
+To run all tests with the different Spring profiles, use the following commands:
+
+```bash
+# Run all tests with the 'command' profile (MongoDB)
+mvn test -Dspring.profiles.active=command
+
+# Run all tests with the 'query' profile (PostgreSQL)
+mvn test -Dspring.profiles.active=query
+
+# Run all tests with the default profile
+mvn test
+```
