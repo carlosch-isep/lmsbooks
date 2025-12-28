@@ -9,6 +9,7 @@ services:
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: password
+            POSTGRES_INITDB_ARGS: "-c wal_level=logical"
         volumes:
             - "postgres_volume:/var/lib/postgresql"
         networks:
