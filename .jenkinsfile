@@ -2,13 +2,11 @@ pipeline {
     agent any
 
     environment {
+        MAVEN_HOME = '/usr/share/maven'
 
-        //MAVEN_HOME = '/opt/homebrew' // (MacOS)
-        MAVEN_HOME = '/usr/share/maven' // (Ubuntu)
-
-        GIT_REPO_URL = 'https://nunopsilva@bitbucket.org/nunopsilva/lms-books.git'  // Your Git repository URL
-        GIT_BRANCH = 'master'  // Specify the branch to check out
-        CREDENTIALS_ID = 'user_app_password_para_bitbucket'  // Credentials ID for authentication
+        GIT_REPO_URL = 'https://github.com/carlosch-isep/lmsbooks.git'
+        GIT_BRANCH = 'main'
+        CREDENTIALS_ID = 'no need'  // Credentials ID for authentication
 
         SERVER_PORT = '2226'
 
@@ -130,15 +128,5 @@ pipeline {
             echo 'Pipeline failed!'
         }
     }
-
-////if containers are to be removed
-//     post {
-//         always {
-//             echo 'Cleaning up...'
-//             sh """
-//                 docker compose -f docker-compose.yml down || true
-//             """
-//         }
-//     }
 
 }

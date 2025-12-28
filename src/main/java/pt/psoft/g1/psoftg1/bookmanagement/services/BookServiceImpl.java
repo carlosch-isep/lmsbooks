@@ -1,6 +1,7 @@
 package pt.psoft.g1.psoftg1.bookmanagement.services;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Profile("postgres")
 @RequiredArgsConstructor
 @PropertySource({ "classpath:config/library.properties" })
 public class BookServiceImpl implements BookService {
