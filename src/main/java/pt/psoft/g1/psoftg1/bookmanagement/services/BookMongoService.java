@@ -4,9 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import pt.psoft.g1.psoftg1.bookmanagement.api.BookViewAMQP;
+import pt.psoft.g1.psoftg1.bookmanagement.api.BookViewAMQPMapper;
 import pt.psoft.g1.psoftg1.bookmanagement.model.*;
+import pt.psoft.g1.psoftg1.bookmanagement.publishers.BookEventsPublisher;
 import pt.psoft.g1.psoftg1.bookmanagement.repository.BookMongoRepository;
+import pt.psoft.g1.psoftg1.genremanagement.model.Genre;
 import pt.psoft.g1.psoftg1.genremanagement.model.GenreMongo;
+import pt.psoft.g1.psoftg1.authormanagement.model.Author;
 import pt.psoft.g1.psoftg1.authormanagement.model.AuthorMongo;
 import pt.psoft.g1.psoftg1.shared.services.Page;
 
@@ -20,6 +24,10 @@ import java.util.stream.Collectors;
 public class BookMongoService implements BookService {
     @Autowired
     private BookMongoRepository bookMongoRepository;
+    @Autowired
+    private BookEventsPublisher bookEventsPublisher;
+    @Autowired
+    private BookViewAMQPMapper bookViewAMQPMapper;
 
     // --- Conversion helpers ---
     private BookMongo toBookMongo(CreateBookRequest resource, String isbn) {
@@ -35,15 +43,37 @@ public class BookMongoService implements BookService {
         return mongo;
     }
 
+    private Genre toGenre(GenreMongo genreMongo) {
+        if (genreMongo == null) return null;
+        return new pt.psoft.g1.psoftg1.genremanagement.model.Genre(genreMongo.getName());
+    }
+
+    private List<Author> toAuthors(List<AuthorMongo> authorMongos) {
+        if (authorMongos == null) return null;
+        return authorMongos.stream()
+            .map(am -> new Author(am.getName(), null, null))
+            .collect(Collectors.toList());
+    }
+
     private Book toBook(BookMongo mongo) {
         if (mongo == null) return null;
+
+        List<Author> authors = toAuthors(mongo.getAuthors());
+        if(authors.isEmpty()){
+            authors.add(new Author(
+                    "Unknown Author",
+                    "Unknown Biography",
+                    null
+            ));
+        }
+
         // Use Book constructor for accessible fields
         return new Book(
             mongo.getIsbn() != null ? mongo.getIsbn().toString() : null,
             mongo.getTitle() != null ? mongo.getTitle().toString() : null,
             mongo.getDescription() != null ? mongo.getDescription().toString() : null,
-            null, // Genre mapping can be improved
-            null, // Authors mapping can be improved
+            toGenre(mongo.getGenre()),
+                authors,
             null  // PhotoURI mapping can be improved
         );
     }
@@ -52,11 +82,17 @@ public class BookMongoService implements BookService {
     public Book create(CreateBookRequest resource, String isbn) {
         BookMongo mongo = toBookMongo(resource, isbn);
         BookMongo saved = bookMongoRepository.save(mongo);
-        return toBook(saved);
+        Book book = toBook(saved);
+        bookEventsPublisher.sendBookCreated(book);
+        return book;
     }
 
     @Override
     public Book create(BookViewAMQP bookViewAMQP) {
+        // Prevent duplicate books: check if exists
+        if (findByIsbn(bookViewAMQP.getIsbn()) != null) {
+            throw new IllegalStateException("Book already exists with ISBN: " + bookViewAMQP.getIsbn());
+        }
         BookMongo mongo = new BookMongo();
         mongo.setIsbn(new Isbn(bookViewAMQP.getIsbn()));
         mongo.setTitle(new Title(bookViewAMQP.getTitle()));
