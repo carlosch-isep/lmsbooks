@@ -98,6 +98,36 @@ Available in the root project
 
 #### Rollout/Deployment (description and argumentation)
 
+The rollout and deployment process for this service leverages Docker Swarm and Traefik for zero-downtime deployments, progressive exposure, and advanced rollout strategies. The provided scripts in the `rollout/` folder automate scaling, traffic shifting, and deployment strategies.
+
+**Canary Deployment:**
+
+- Canary deployment is implemented using Traefik dynamic configuration and the rollout scripts.
+- When a new version is deployed, it is initially exposed to a small percentage of users (e.g., 5%) using the canary configuration.
+- The rollout/rolloutCanary.sh script is used to automate this process, gradually increasing traffic to the new version while monitoring for errors.
+- If no issues are detected, the exposure is increased until all users are using the new version.
+- If problems are detected, the rollout can be automatically or manually reverted using the provided scripts.
+
+**Blue/Green and Other Strategies:**
+
+- The rollout/switchBlueGreen.sh script allows switching between blue and green deployments for instant rollback or cutover.
+- The rollout/setWeights.sh script can be used to adjust traffic weights or scale services for both command and query instances.
+
+**Example Usage:**
+
+```bash
+# Start a canary rollout
+cd rollout
+./rolloutCanary.sh lmsbooks_command
+./rolloutCanary.sh lmsbooks_query
+
+# Switch between blue/green deployments
+./switchBlueGreen.sh lmsbooks_command
+./switchBlueGreen.sh lmsbooks_query
+```
+
+_Replace `lmsbooks_command` and `lmsbooks_query` with your actual service names as defined in your Docker Swarm stack._
+
 #### Deployment to production of service A is automatic
 
 #### Service B deploys only after manual approval following a notification (email or equivalent message)
@@ -113,7 +143,41 @@ The following test are execute in the staging environment using k6:
 ```
 
 #### Scale services via scripts based on load-test results
-TODO
+
+You can scale services in Docker Swarm using the scripts provided in the `rollout/` folder. These scripts automate scaling, traffic shifting, and deployment strategies.
+
+1. **Manual Scaling Example:**
+
+```bash
+# Scale the 'command' (MongoDB) service to 4 replicas
+cd rollout
+./setWeights.sh lmsbooks_command 4
+
+# Scale the 'query' (PostgreSQL) service to 4 replicas
+cd rollout
+./setWeights.sh lmsbooks_query 4
+```
+
+2. **Automated Scaling Based on Load-Test Results:**
+
+After running your k6 load test, parse the results and trigger scaling if needed:
+
+```bash
+k6 run ../load-tests/get-books.js > k6_output.txt
+# Example: If average response time > 500ms, scale up 'command' and 'query' services
+if grep -q 'http_req_duration.*avg.*[5-9][0-9][0-9]ms' k6_output.txt; then
+  cd rollout
+  ./setWeights.sh lmsbooks_command 4
+  ./setWeights.sh lmsbooks_query 4
+fi
+```
+
+3. **Other Rollout Scripts:**
+- `rollout/activateService.sh` – Activate a service instance
+- `rollout/deactivateService.sh` – Deactivate a service instance
+- `rollout/switchBlueGreen.sh` – Switch between blue/green deployments
+- `rollout/rolloutCanary.sh` – Perform canary rollout
+- `rollout/setWeights.sh` – Adjust traffic weights or scale services
 
 #### Smoke tests in dev and staging environments
 The same load test executed in dev and staging environments are also used as smoke tests, but with reduced load:
