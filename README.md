@@ -47,30 +47,41 @@ The service publishes domain events to RabbitMQ when significant actions occur, 
 #### Saga
 
 To simplify the implementation, I used a simple local saga pattern using only the books service. In a real-world scenario, the saga would involve multiple services.
+
+With this SAGA Implementation we make sure all dependencies (Author and Genre) are created before creating the Book.
+If any dependency creation fails, the process is canceled, and we have the data to retry later if we want.
+
 ```mermaid
 sequenceDiagram
     autonumber
     participant U as Utilizador
-    participant S1 as Serviço A (Book)
+    participant BO as Book
     participant DB as Base de Dados
-    participant B as Message Broker
-    participant S2 as Serviço B (Author)
+    participant MB as Message Broker
+    participant AU as Author
+    participant GE as Genre
 
     Note over U, S2: Fluxo de Sucesso
-    U->>S1: 1. Iniciar Pedido
-    S1->>DB: 2. Gravar Pedido (Status: PENDING)
-    Note right of S1: Risco de falha aqui (Dual Write)
-    S1->>B: 3. Publicar Evento "PedidoCriado"
-    B->>S2: 4. Encaminhar Evento
-    S2->>S2: 5. Processar Book
-    S2->>B: 6. Publicar "book_created"
-    B->>S1: 7. Notificar Sucesso
-    S1->>DB: 8. Atualizar Status (COMPLETED)
-
-    Note over U, S2: Fluxo de Compensação (Erro no Serviço B)
-    S2-->>B: 9. Publicar "book_canceled"
-    B-->>S1: 10. Notificar Falha
-    S1->>DB: 11. Rollback: Status (CANCELLED)
+    U->>BO: 1. Iniciar Pedido
+    BO->>MB: 2. Subscreve "book_created", "author_created", "genre_created"
+    AU->>MB: 4. Subscreve "book_processed", "book_created", "author_created", "genre_created"
+    GE->>MB: 5. Subscreve "book_processed", "book_created", "author_created", "genre_created"
+    BO->>DB: 2. Gravar Pedido (Status: PENDING)
+    BO->>MB: 3. Publicar Evento "book_processed"
+    MB->>AU: 6. Recebe "book_processed" e cria o Author
+    MB->>GE: 7. Recebe "book_processed" e cria e Genre
+    AU->>MB: 8. Publicar "author_created"
+    GE->>MB: 9. Publicar "genre_created"
+    MB->>BO: 10. Eventos "author_created" e "genre_created"
+    BO->>BO: 11. Atualiza Author
+    BO->>BO: 11. Atualiza Genre
+    BO->>BO: 11. Valida se todas as dependências foram criadas
+    BO->>BO: 12. Criar Book
+    BO->>MB: 12. Publicar "book_created"
+    BO->>BO: 13. Atualizar Pedido (Status: COMPLETED)
+    Note over U, S2: Fluxo de Erro (Erro no Author ou Genre)
+    MB->>BO: 8. Não recebe author_created ou genre_created
+    BO->>MB: 9. As dependências não foram criadas, publicar "canceled"
 ```
 #### Change Data Capture (CDC)
 
