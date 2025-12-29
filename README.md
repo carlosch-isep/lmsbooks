@@ -62,26 +62,26 @@ sequenceDiagram
     participant GE as Genre
 
     Note over U, S2: Fluxo de Sucesso
-    U->>BO: 1. Iniciar Pedido
-    BO->>MB: 2. Subscreve "book_created", "author_created", "genre_created"
-    AU->>MB: 4. Subscreve "book_processed", "book_created", "author_created", "genre_created"
-    GE->>MB: 5. Subscreve "book_processed", "book_created", "author_created", "genre_created"
-    BO->>DB: 2. Gravar Pedido (Status: PENDING)
-    BO->>MB: 3. Publicar Evento "book_processed"
-    MB->>AU: 6. Recebe "book_processed" e cria o Author
-    MB->>GE: 7. Recebe "book_processed" e cria e Genre
-    AU->>MB: 8. Publicar "author_created"
-    GE->>MB: 9. Publicar "genre_created"
-    MB->>BO: 10. Eventos "author_created" e "genre_created"
-    BO->>BO: 11. Atualiza Author
-    BO->>BO: 11. Atualiza Genre
-    BO->>BO: 11. Valida se todas as dependências foram criadas
-    BO->>BO: 12. Criar Book
-    BO->>MB: 12. Publicar "book_created"
-    BO->>BO: 13. Atualizar Pedido (Status: COMPLETED)
+    BO->>MB: 1. Subscreve "book_created", "author_created", "genre_created"
+    AU->>MB: 2. Subscreve "book_processed", "book_created", "author_created"
+    GE->>MB: 3. Subscreve "book_processed", "book_created", "genre_created"
+    U->>BO: 4. Iniciar Pedido
+    BO->>DB: 5. Gravar Pedido (Status: PENDING)
+    BO->>MB: 6. Publicar Evento "book_processed"
+    MB->>AU: 7. Recebe "book_processed" e cria o Author
+    MB->>GE: 8. Recebe "book_processed" e cria e Genre
+    AU->>MB: 9. Publicar "author_created"
+    GE->>MB: 10. Publicar "genre_created"
+    MB->>BO: 11. Eventos "author_created" e "genre_created"
+    BO->>BO: 12. Atualiza Author
+    BO->>BO: 13. Atualiza Genre
+    BO->>BO: 14. Valida se todas as dependências foram criadas
+    BO->>BO: 15. Criar Book
+    BO->>MB: 16. Publicar "book_created"
+    BO->>BO: 17. Atualizar Pedido (Status: COMPLETED)
     Note over U, S2: Fluxo de Erro (Erro no Author ou Genre)
-    MB->>BO: 8. Não recebe author_created ou genre_created
-    BO->>MB: 9. As dependências não foram criadas, publicar "canceled"
+    MB->>BO: 11. Não recebe author_created ou genre_created
+    BO->>MB: 12. As dependências não foram criadas, publicar "canceled"
 ```
 #### Change Data Capture (CDC)
 
