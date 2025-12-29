@@ -51,10 +51,10 @@ To simplify the implementation, I used a simple local saga pattern using only th
 sequenceDiagram
     autonumber
     participant U as Utilizador
-    participant S1 as Serviço A (Order)
+    participant S1 as Serviço A (Book)
     participant DB as Base de Dados
     participant B as Message Broker
-    participant S2 as Serviço B (Payment)
+    participant S2 as Serviço B (Author)
 
     Note over U, S2: Fluxo de Sucesso
     U->>S1: 1. Iniciar Pedido
@@ -62,13 +62,13 @@ sequenceDiagram
     Note right of S1: Risco de falha aqui (Dual Write)
     S1->>B: 3. Publicar Evento "PedidoCriado"
     B->>S2: 4. Encaminhar Evento
-    S2->>S2: 5. Processar Pagamento
-    S2->>B: 6. Publicar "PagamentoConcluido"
+    S2->>S2: 5. Processar Book
+    S2->>B: 6. Publicar "book_created"
     B->>S1: 7. Notificar Sucesso
     S1->>DB: 8. Atualizar Status (COMPLETED)
 
     Note over U, S2: Fluxo de Compensação (Erro no Serviço B)
-    S2-->>B: 9. Publicar "PagamentoFalhou"
+    S2-->>B: 9. Publicar "book_canceled"
     B-->>S1: 10. Notificar Falha
     S1->>DB: 11. Rollback: Status (CANCELLED)
 ```
