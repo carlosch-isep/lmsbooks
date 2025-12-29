@@ -47,7 +47,31 @@ The service publishes domain events to RabbitMQ when significant actions occur, 
 #### Saga
 
 To simplify the implementation, I used a simple local saga pattern using only the books service. In a real-world scenario, the saga would involve multiple services.
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as Utilizador
+    participant S1 as Serviço A (Order)
+    participant DB as Base de Dados
+    participant B as Message Broker
+    participant S2 as Serviço B (Payment)
 
+    Note over U, S2: Fluxo de Sucesso
+    U->>S1: 1. Iniciar Pedido
+    S1->>DB: 2. Gravar Pedido (Status: PENDING)
+    Note right of S1: Risco de falha aqui (Dual Write)
+    S1->>B: 3. Publicar Evento "PedidoCriado"
+    B->>S2: 4. Encaminhar Evento
+    S2->>S2: 5. Processar Pagamento
+    S2->>B: 6. Publicar "PagamentoConcluido"
+    B->>S1: 7. Notificar Sucesso
+    S1->>DB: 8. Atualizar Status (COMPLETED)
+
+    Note over U, S2: Fluxo de Compensação (Erro no Serviço B)
+    S2-->>B: 9. Publicar "PagamentoFalhou"
+    B-->>S1: 10. Notificar Falha
+    S1->>DB: 11. Rollback: Status (CANCELLED)
+```
 #### Change Data Capture (CDC)
 
 The service uses Debezium to capture changes in the PostgreSQL database and publish them to Rabbit
