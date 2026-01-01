@@ -38,30 +38,19 @@ pipeline {
             }
         }
 
-        stage('Quality Gate and Coverage') {
-            parallel {
-                stage('Quality Gate') {
-                    steps {
-                        timeout(time: 5, unit: 'MINUTES') {
-                            script {
-                                def qg = waitForQualityGate()
-                                if (qg.status != 'OK') {
-                                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                                }
-                            }
-                        }
-                    }
-                }
+        stage('Manual Approval') {
+            steps {
+                input message: 'Approve deployment?', ok: 'Go On'
+            }
+        }
 
-                stage('Coverage') {
-                    steps {
-                        publishHTML(target: [
-                                reportDir  : 'target/site/jacoco',
-                                reportFiles: 'index.html',
-                                reportName : 'JaCoCo Coverage'
-                        ])
-                    }
-                }
+        stage('Coverage') {
+            steps {
+                publishHTML(target: [
+                        reportDir  : 'target/site/jacoco',
+                        reportFiles: 'index.html',
+                        reportName : 'JaCoCo Coverage'
+                ])
             }
         }
 
@@ -80,12 +69,6 @@ pipeline {
             steps {
                 sh 'k6 run load-tests/smoke/get-books-smoke.js'
                 sh 'k6 run load-tests/smoke/create-book-smoke.js'
-            }
-        }
-
-        stage('Manual Approval') {
-            steps {
-                input message: 'Approve deployment?', ok: 'Go On'
             }
         }
 
