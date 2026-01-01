@@ -1,4 +1,3 @@
-
 services:
     lmsbooks_1:
         image: lmsbooks:latest
