@@ -85,6 +85,12 @@ pipeline {
             }
         }
 
+        stage('Manual Approval') {
+            steps {
+                input message: 'Approve deployment?', ok: 'Go On'
+            }
+        }
+
         stage('Deploy @ Staging') {
             when {
                 branch 'staging'

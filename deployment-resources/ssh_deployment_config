@@ -1,0 +1,11 @@
+Host production
+    HostName lms-isep.ovh
+    User root
+    IdentityFile deployment-resources/id_rsa_custom
+    ForwardAgent yes
+
+Host staging
+    HostName sonar.lms-isep.ovh
+    User root
+    IdentityFile deployment-resources/id_rsa_custom
+    ForwardAgent yes
