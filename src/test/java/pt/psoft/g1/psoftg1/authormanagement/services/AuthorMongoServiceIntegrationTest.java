@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("command")
-class AuthorMongoServiceIntegrationTest {
+class   AuthorMongoServiceIntegrationTest {
     @Autowired
     private AuthorMongoService authorMongoService;
     @Autowired

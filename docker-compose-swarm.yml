@@ -13,7 +13,7 @@ services:
     deploy:
       replicas: 2
     ports:
-      - "8088:8080"  # Expose the lmsbooks service on port 8087
+      - "8087-8090:8080"  # Expose the lmsbooks service on port 8087 - 8090
     networks:
       - lms_network
   lmsbooks-instance2:
@@ -28,9 +28,9 @@ services:
     volumes:
       - "uploaded_files_volume_2:/tmp"
     deploy:
-      replicas: 2
+      replicas: 1
     ports:
-      - "8089:8080"  # Expose the lmsbooks service on port 8087
+      - "8091:8095"  # Expose the lmsbooks service on port 8091 - 8095
     networks:
       - lms_network
 
@@ -41,7 +41,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     deploy:
-      replicas: 2
+      replicas: 1
     ports:
       - "5432-5450:5432"
 

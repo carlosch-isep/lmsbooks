@@ -20,9 +20,13 @@ public  class RabbitmqClientConfig {
 
     private static class ReceiverConfig {
 
+        @Bean
+        public Queue bookCreatedQueue() {
+            return new Queue("book.created.queue", true);
+        }
+
         @Bean(name = "autoDeleteQueue_Book_Created")
         public Queue autoDeleteQueue_Book_Created() {
-
             System.out.println("autoDeleteQueue_Book_Created created!");
             return new AnonymousQueue();
         }
