@@ -35,7 +35,11 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('MySonarQubeServer') {
-                    sh 'mvn sonar:sonar'
+                    sh 'mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                          -Dsonar.projectKey=lmsbooks \
+                          -Dsonar.projectName='lmsbooks' \
+                          -Dsonar.host.url=http://lms-isep.ovh:9000 \
+                          -Dsonar.token=sqp_9725d3092dae2c35882ba7b495365296840188b1'
                 }
             }
         }
