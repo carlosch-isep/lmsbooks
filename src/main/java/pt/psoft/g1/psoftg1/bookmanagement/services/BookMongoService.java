@@ -37,7 +37,7 @@ public class BookMongoService implements BookService {
         mongo.setDescription(new Description(resource.getDescription()));
         mongo.setGenre(new GenreMongo(null, resource.getGenre()));
         List<AuthorMongo> authors = resource.getAuthors().stream()
-                .map(a -> new AuthorMongo(null, a.getName()))
+                .map(a -> new AuthorMongo(null, a.getName(), a.getBio()))
                 .collect(Collectors.toList());
         mongo.setAuthors(authors);
         return mongo;
@@ -51,7 +51,7 @@ public class BookMongoService implements BookService {
     private List<Author> toAuthors(List<AuthorMongo> authorMongos) {
         if (authorMongos == null) return null;
         return authorMongos.stream()
-            .map(am -> new Author(am.getName(), null, null))
+            .map(am -> new Author(am.getName(), am.getBio(), null))
             .collect(Collectors.toList());
     }
 
@@ -118,7 +118,7 @@ public class BookMongoService implements BookService {
         mongo.setDescription(new Description(resource.getDescription()));
         mongo.setGenre(new GenreMongo(null, resource.getGenre()));
         List<AuthorMongo> authors = resource.getAuthors().stream()
-                .map(a -> new AuthorMongo(null, String.valueOf(a)))
+                .map(a -> new AuthorMongo(null, String.valueOf(a), "Lorem ipsum dolor sit amet, consectetur adipiscing elit."))
                 .collect(Collectors.toList());
         mongo.setAuthors(authors);
         BookMongo saved = bookMongoRepository.save(mongo);

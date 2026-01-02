@@ -22,7 +22,6 @@ public class Book extends EntityWithPhoto {
     long pk;
 
     @Version
-    @Getter
     private Long version;
 
     @Embedded
@@ -59,6 +58,10 @@ public class Book extends EntityWithPhoto {
 
     private void setGenre(Genre genre) {
         this.genre = genre;
+    }
+
+    public Long getVersion() {
+        return Objects.requireNonNullElse(this.version, 1L);
     }
 
     private void setAuthors(List<Author> authors) {

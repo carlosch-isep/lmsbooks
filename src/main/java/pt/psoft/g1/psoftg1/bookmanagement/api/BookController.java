@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Tag(name = "Books", description = "Endpoints for managing Books")
 @RestController
 @RequestMapping("/api/books")
@@ -43,10 +45,11 @@ public class BookController {
     private final BookViewMapper bookViewMapper;
 
     @Operation(summary = "Register a new Book")
-    @PutMapping(value = "/{isbn}")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<BookView> create(CreateBookRequest resource, @PathVariable("isbn") String isbn) {
-
+    public ResponseEntity<BookView> create(
+            @RequestBody @Valid CreateBookRequest resource
+    ) {
         // Guarantee that the client doesn't provide a link on the body, null = no photo or error
         resource.setPhotoURI(null);
         MultipartFile file = resource.getPhoto();
@@ -59,7 +62,7 @@ public class BookController {
 
         Book book;
         if (bookCommandService != null) {
-            book = bookCommandService.create(resource, isbn);
+            book = bookCommandService.create(resource, resource.getIsbn());
         } else {
             throw new IllegalStateException("Command service not available");
         }

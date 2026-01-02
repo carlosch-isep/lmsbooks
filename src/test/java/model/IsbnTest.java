@@ -43,7 +43,7 @@ class IsbnTest {
 
     @Test
     void ensureIsbn13IsSet() {
-        final var isbn = new Isbn("9782826012092");
+            final var isbn = new Isbn("9782826012092");
         assertEquals("9782826012092", isbn.toString());
     }
 

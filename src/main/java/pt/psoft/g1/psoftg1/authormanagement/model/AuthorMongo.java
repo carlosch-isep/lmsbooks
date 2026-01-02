@@ -11,10 +11,12 @@ import java.io.Serializable;
 public class AuthorMongo implements Serializable {
     private String id;
     private String name;
+    private String bio;
 
     public AuthorMongo() {}
-    public AuthorMongo(String id, String name) {
+    public AuthorMongo(String id, String name, String bio) {
         this.id = id;
         this.name = name;
+        this.bio = bio;
     }
 }

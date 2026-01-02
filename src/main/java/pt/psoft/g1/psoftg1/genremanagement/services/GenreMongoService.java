@@ -1,20 +1,21 @@
 package pt.psoft.g1.psoftg1.genremanagement.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import pt.psoft.g1.psoftg1.genremanagement.model.Genre;
 import pt.psoft.g1.psoftg1.genremanagement.model.GenreMongo;
 import pt.psoft.g1.psoftg1.genremanagement.repository.GenreMongoRepository;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Profile("command")
+@Primary
+@RequiredArgsConstructor
 public class GenreMongoService implements GenreService {
-    @Autowired
-    private GenreMongoRepository genreMongoRepository;
+    private final GenreMongoRepository genreMongoRepository;
 
     // --- Mapping methods ---
     private Genre toGenre(GenreMongo mongo) {
