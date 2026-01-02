@@ -2,6 +2,15 @@ pipeline {
     agent any
 
     stages {
+        stage('Initialize') {
+            steps {
+                slackSend(
+                    color: '#f0544c',
+                    message: "🚀 *Started:* Job ${env.JOB_NAME} [Build #${env.BUILD_NUMBER}] (<${env.BUILD_URL}|Check Console>)"
+                )
+            }
+        }
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -99,11 +108,11 @@ pipeline {
     }
 
     post {
-        success {
-            echo 'Build completed successfully!'
-        }
-        failure {
-            echo 'Build failed!'
+        always {
+            slackSend(
+                color: "${currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger'}",
+                message: "Build ${env.JOB_NAME} #${env.BUILD_NUMBER}: ${currentBuild.currentResult} (<${env.BUILD_URL}|Open Jenkins>)"
+            )
         }
     }
 
