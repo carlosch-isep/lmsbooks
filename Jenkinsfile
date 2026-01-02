@@ -80,7 +80,7 @@ pipeline {
             }
             steps {
                 sh 'chmod 600 ./deployment-resources/id_rsa_custom'
-                sh 'scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/psoft-g1-0.0.1-SNAPSHOT.war staging:/opt/tomcat/webapps/psoft-g1-0.0.1-SNAPSHOT.war'
+                sh 'scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-0.0.1-SNAPSHOT.jar staging:/opt/books/staging/LMSBooks-0.0.1-SNAPSHOT.jar'
             }
         }
 
@@ -92,7 +92,7 @@ pipeline {
             }
             steps {
                 sh 'chmod 600 ./deployment-resources/id_rsa_custom'
-                sh 'scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/psoft-g1-0.0.1-SNAPSHOT.war production:/opt/tomcat/webapps/psoft-g1-0.0.1-SNAPSHOT.war'
+                sh 'scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-0.0.1-SNAPSHOT.jar production:/opt/books/main/LMSBooks-0.0.1-SNAPSHOT.jar'
             }
         }
     }
