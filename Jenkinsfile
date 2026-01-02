@@ -50,6 +50,10 @@ pipeline {
 
         stage('Manual Approval') {
             steps {
+                slackSend(
+                    color: '#f0544c',
+                    message: "Deploy manual approve needed (<${env.BUILD_URL}|Check Console>)"
+                )
                 input message: 'Approve deployment?', ok: 'Go On'
             }
         }
