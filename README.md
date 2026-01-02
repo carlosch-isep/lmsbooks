@@ -174,7 +174,6 @@ The following test are execute in the staging environment using k6:
 ```bash
   k6 run --vus 100 --duration 30s load-tests/get-books.js
   k6 run --vus 100 --duration 30s load-tests/create-book.js
-  k6 run --vus 100 --duration 30s load-tests/mixed-scenario.js
 ```
 
 #### Scale services via scripts based on load-test results

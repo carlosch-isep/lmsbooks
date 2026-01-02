@@ -3,11 +3,11 @@ import { check, sleep } from 'k6';
 
 export let options = {
     vus: 1,
-    duration: '3s',
+    duration: '1s',
 };
 
 export default function () {
-    // Nota: Garanta que este Token seja um JWT válido e não apenas uma chave pública RSA
+
     const TOKEN = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAiuZ4N2VZ8bo95gLg/tyV' +
         'p6hEaR7NnXqGsPdg7iWVEnHLMEMEpxKKSRqies2xgqJYK+vqdXF5qmIc9arMsKQQ' +
         'wHW8U3uMUtfAE5XMjgX0eUv4MrZOexJViUxgHpWo214J3tq/+hXuuoFnz514q18d' +
@@ -28,7 +28,7 @@ export default function () {
         },
     };
 
-    const url = 'http://books_query:8088/api/books?title=The%20Art%20of%20Clean%20Code';
+    const url = 'http://localhost:8088/api/query/books?title=The%20Art%20of%20Clean%20Code';
 
     let res = http.get(url, params);
 

@@ -29,7 +29,7 @@ export default function () {
     headers: { 'Content-Type': 'application/json' },
   };
 
-  let res = http.post('http://localhost:8087/api/books', payload, params);
+  let res = http.post('http://localhost:8087/api/command/books', payload, params);
   check(res, { 'created': (r) => r.status === 201 });
   sleep(1);
 }
