@@ -8,13 +8,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Embeddable
+@Getter
 public class Title {
-    @Transient
-    private final int TITLE_MAX_LENGTH = 128;
     @NotBlank(message = "Title cannot be blank")
-    @Size(min = 1, max = TITLE_MAX_LENGTH)
-    @Column(name = "TITLE", length = TITLE_MAX_LENGTH)
-    @Getter
+    @Size(min = 1)
+    @Column(name = "TITLE")
     String title;
 
     protected Title() {
@@ -25,17 +23,12 @@ public class Title {
     }
 
     public void setTitle(String title) {
-
-        /*
-         * if (!StringUtilsCustom.startsOrEndsInWhiteSpace(title)) { throw new
-         * IllegalArgumentException("Invalid title: " + title); }
-         */
         if (title == null)
             throw new IllegalArgumentException("Title cannot be null");
         if (title.isBlank())
             throw new IllegalArgumentException("Title cannot be blank");
-        if (title.length() > TITLE_MAX_LENGTH)
-            throw new IllegalArgumentException("Title has a maximum of " + TITLE_MAX_LENGTH + " characters");
+        if (title.length() > 100)
+            throw new IllegalArgumentException("Title has a maximum of 100 characters");
         this.title = title.strip();
     }
 

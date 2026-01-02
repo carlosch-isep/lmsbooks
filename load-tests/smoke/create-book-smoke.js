@@ -8,10 +8,21 @@ export let options = {
 
 export default function () {
   let payload = JSON.stringify({
-    title: `Smoke Book ${__VU}-${__ITER}`,
-    author: "Smoke Test Author",
-    isbn: `978-3-16-148410-${__VU}`,
-    description: "Smoke test book"
+    isbn: "9783161484100",
+    title: "The Art of Clean Code",
+    genre: "Software Development",
+    description: "A comprehensive guide to writing maintainable and efficient software.",
+    photoURI: "uploads/books/covers/clean-code.jpg",
+    authors: [
+      {
+        "name": "John Doe",
+        "bio": "A veteran software architect with 20 years of experience."
+      },
+      {
+        "name": "Jane Smith",
+        "bio": "Open source contributor and technical writer."
+      }
+    ]
   });
 
   let params = {

@@ -7,20 +7,22 @@ export let options = {
 };
 
 export default function () {
-    // GET books
-    let res = http.get('http://localhost:8087/api/books');
-    check(res, { 'GET status 200': (r) => r.status === 200 });
-
     // POST book
+    const TITLE = `Book ${__VU}-${__ITER}`;
     let payload = JSON.stringify({
-        title: `Book ${__VU}-${__ITER}`,
+        title: "${TITLE}",
         author: "Test Author",
-        isbn: `978-3-16-148410-${__VU}`,
+        isbn: `978316148410${__VU}`,
         description: "Load test book"
     });
     let params = { headers: { 'Content-Type': 'application/json' } };
-    let postRes = http.post('http://localhost:8087/api/books', payload, params);
+    let postRes = http.post('http://localhost:8088/api/books', payload, params);
     check(postRes, { 'POST status 201': (r) => r.status === 201 });
+
+
+    // GET books
+    let res = http.get('http://localhost:8087/api/books');
+    check(res, { 'GET status 200': (r) => r.status === 200 });
 
     sleep(1);
 }

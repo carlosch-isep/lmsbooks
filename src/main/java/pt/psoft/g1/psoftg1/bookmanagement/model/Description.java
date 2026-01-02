@@ -9,11 +9,9 @@ import pt.psoft.g1.psoftg1.shared.model.StringUtilsCustom;
 
 @Embeddable
 public class Description {
-    @Transient
-    private final int DESC_MAX_LENGTH = 4096;
 
-    @Size(max = DESC_MAX_LENGTH)
-    @Column(length = DESC_MAX_LENGTH)
+    @Size(max = 4096)
+    @Column(length = 4096)
     String description;
 
     public Description(String description) {
@@ -26,7 +24,7 @@ public class Description {
     public void setDescription(@Nullable String description) {
         if (description == null || description.isBlank()) {
             this.description = null;
-        } else if (description.length() > DESC_MAX_LENGTH) {
+        } else if (description.length() > 4096) {
             throw new IllegalArgumentException("Description has a maximum of 4096 characters");
         } else {
             this.description = StringUtilsCustom.sanitizeHtml(description);
