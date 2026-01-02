@@ -1,38 +1,41 @@
 services:
     lmsbooks_1:
         image: lmsbooks:latest
-        container_name: books1_in_lms_network
+        container_name: books_command
         build:
             context: .
             dockerfile: Dockerfile
         ports:
             - "8087:8080"
         environment:
-            SPRING_PROFILES_ACTIVE: instance1,bootstrap
+            SPRING_PROFILES_ACTIVE: command
+            SPRING_DATA_MONGODB_HOST: mongodb_in_lms_network
+            SPRING_DATA_MONGODB_PORT: 27017
+            SPRING_DATA_MONGODB_DATABASE: lmsbooks_mongo
         networks:
             - lms_network
         volumes:
-            - "uploaded_files_volume_1:/tmp"
+            - "uploaded_files_command:/tmp"
 
     lmsbooks_2:
         image: lmsbooks:latest
-        container_name: books2_in_lms_network
+        container_name: books_query
         build:
             context: .
             dockerfile: Dockerfile
         ports:
             - "8088:8080"
         environment:
-            SPRING_PROFILES_ACTIVE: instance2,bootstrap
+            SPRING_PROFILES_ACTIVE: query,bootstrap
         networks:
             - lms_network
         volumes:
-            - "uploaded_files_volume_2:/tmp"
+            - "uploaded_files_query:/tmp"
 
 networks:
     lms_network:
         external: true
 
 volumes:
-    uploaded_files_volume_1:
-    uploaded_files_volume_2:
+    uploaded_files_command:
+    uploaded_files_query:

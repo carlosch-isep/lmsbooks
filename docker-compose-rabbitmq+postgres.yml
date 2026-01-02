@@ -41,6 +41,8 @@ services:
     mongodb:
         image: mongo:7
         container_name: mongodb_in_lms_network
+        volumes:
+            - "mongo_volume:/var/lib/mongodb"
         restart: unless-stopped
         ports:
             - "27017:27017"
@@ -53,3 +55,4 @@ networks:
 
 volumes:
     postgres_volume:
+    mongo_volume:
