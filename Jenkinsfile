@@ -74,7 +74,9 @@ pipeline {
 
         stage('Deploy @ Staging') {
             when {
-                branch 'staging'
+                expression {
+                    return env.GIT_BRANCH == 'origin/staging' || env.GIT_BRANCH == 'staging'
+                }
             }
             steps {
                 sh 'chmod 600 ./deployment-resources/id_rsa_custom'
@@ -84,7 +86,9 @@ pipeline {
 
         stage('Deploy @ Production') {
             when {
-                branch 'main'
+                expression {
+                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
+                }
             }
             steps {
                 sh 'chmod 600 ./deployment-resources/id_rsa_custom'
