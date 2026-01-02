@@ -1,11 +1,13 @@
 Host production
     HostName lms-isep.ovh
-    User root
+    User fedora
     IdentityFile deployment-resources/id_rsa_custom
+    KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
     ForwardAgent yes
 
 Host staging
-    HostName sonar.lms-isep.ovh
-    User root
+    HostName lms-isep.ovh
+    User fedora
     IdentityFile deployment-resources/id_rsa_custom
+    KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256
     ForwardAgent yes
