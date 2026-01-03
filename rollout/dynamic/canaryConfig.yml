@@ -1,13 +1,10 @@
-# Conteúdo de ./rollout/dynamic/canary_rules.yml
 http:
   routers:
-    # Encaminha POST para o Weighted Service do Command
     router-command:
       rule: "Host(`lms-isep.ovh`) && Method(`POST`, `PUT`, `DELETE`, `PATCH`)"
       service: service-command-canary
       entryPoints: ["web"]
 
-    # Encaminha GET para o Weighted Service do Query
     router-query:
       rule: "Host(`lms-isep.ovh`) && Method(`GET`)"
       service: service-query-canary
@@ -17,15 +14,15 @@ http:
     service-command-canary:
       weighted:
         services:
-          - name: command-stable@docker
+          - name: command-stable@swarm
             weight: 90
-          - name: command-canary@docker
+          - name: command-canary@swarm
             weight: 10
 
     service-query-canary:
       weighted:
         services:
-          - name: query-stable@docker
+          - name: query-stable@swarm
             weight: 90
-          - name: query-canary@docker
+          - name: query-canary@swarm
             weight: 10
