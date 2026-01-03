@@ -1,15 +1,31 @@
+# Conteúdo de ./rollout/dynamic/canary_rules.yml
 http:
+  routers:
+    # Encaminha POST para o Weighted Service do Command
+    router-command:
+      rule: "Host(`lms-isep.ovh`) && Method(`POST`)"
+      service: service-command-canary
+      entryPoints: ["web"]
+
+    # Encaminha GET para o Weighted Service do Query
+    router-query:
+      rule: "Host(`lms-isep.ovh`) && Method(`GET`)"
+      service: service-query-canary
+      entryPoints: ["web"]
+
   services:
-    lmsbooks_split:
+    service-command-canary:
       weighted:
         services:
-          - name: lmsbooks_blue@swarm
-            weight: 20
-          - name: lmsbooks_green@swarm
-            weight: 80
+          - name: command-stable@docker
+            weight: 90
+          - name: command-canary@docker
+            weight: 10
 
-  routers:
-    lmsbooks_router:
-      entryPoints: ["web"]
-      rule: "PathPrefix(`/`)"
-      service: lmsbooks_split
+    service-query-canary:
+      weighted:
+        services:
+          - name: query-stable@docker
+            weight: 90
+          - name: query-canary@docker
+            weight: 10

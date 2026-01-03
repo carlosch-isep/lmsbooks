@@ -3,11 +3,6 @@ def containerPush
 def deployment
 def release
 
-def config = [
-    'Staging':'staging',
-    'Production':'production'
-]
-
 pipeline {
     agent any
 
@@ -20,7 +15,12 @@ pipeline {
         choice(
             name: 'DEPLOY_ENV',
             choices: ['Staging', 'Production'],
-            description: 'Para qual ambiente queres fazer o deploy?'
+            description: 'Select the environment you want'
+        )
+        choice(
+            name: 'DEPLOY_STRATEGY',
+            choice: ['SWITCH', 'CANARY'],
+            description: 'Select the deploy strategy'
         )
     }
 
@@ -116,7 +116,7 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     script {
-                        containerPush.containerPush("${config[params.DEPLOY_ENV]}-${env.BUILD_NUMBER}", DOCKER_USER, DOCKER_PASS)
+                        containerPush.containerPush("${params.DEPLOY_ENV.toLowerCase()}-${env.BUILD_NUMBER}", DOCKER_USER, DOCKER_PASS)
                     }
                 }
             }
@@ -125,7 +125,7 @@ pipeline {
         stage("Deploy Docker Struct"){
             steps{
                 script{
-                    deployment.dockerConfig(config[params.DEPLOY_ENV])
+                    deployment.dockerConfig(params.DEPLOY_ENV.toLowerCase())
                 }
             }
         }
@@ -133,7 +133,7 @@ pipeline {
         stage("Deploy") {
             steps {
                 script {
-                    deployment.deploy(config[params.DEPLOY_ENV])
+                    deployment.deploy(params.DEPLOY_ENV.toLowerCase(), params.DEPLOY_STRATEGY.toLowerCase())
                 }
             }
         }

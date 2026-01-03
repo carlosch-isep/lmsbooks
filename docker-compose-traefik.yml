@@ -24,7 +24,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./rollout/dynamic:/etc/traefik/dynamic
     networks:
-      - lms_overlay_attachable_network
+      - lms_network
     deploy:
       placement:
         constraints:
@@ -34,5 +34,5 @@ services:
         - "traefik.enable=true"
 
 networks:
-  lms_overlay_attachable_network:
+  lms_network:
     external: true
