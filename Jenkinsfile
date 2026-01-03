@@ -61,7 +61,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    sh "mvn sonar:sonar -Dsonar.projectKey=lmsbooks -Dsonar.host.url=http://lms-isep.ovh:9000 -Dsonar.token=${SONAR_TOKEN}"
+                    sh "mvn verify -DskipUTs -DskipITs org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=lmsbooks -Dsonar.projectName='lmsbooks' -Dsonar.host.url='http://lms-isep.ovh:9000' -Dsonar.token=${SONAR_TOKEN}"
                 }
             }
         }
