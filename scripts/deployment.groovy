@@ -36,8 +36,8 @@ def deploy(branch, strategy) {
 
         // Make sure network exists
         """ ${ssh} ${branch} '
-        if ! docker network ls | grep -q "lms_overlay_attachable_network"; then
-            docker network create --driver overlay --attachable lms_overlay_attachable_network
+        if ! docker network ls | grep -q "lms_network"; then
+            docker network create --driver overlay --attachable lms_network
         fi
         '
         """

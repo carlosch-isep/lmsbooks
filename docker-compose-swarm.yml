@@ -10,7 +10,9 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.services.command-stable.loadbalancer.server.port=8080"
+        - "traefik.http.routers.command-router.rule=Method(`POST`, `PUT`, `DELETE`, `PATCH`)"
+        - "traefik.http.routers.command-router.entrypoints=web"
+        - "traefik.http.services.command-service.loadbalancer.server.port=8080"
     networks:
       - lms_network
 
@@ -22,7 +24,10 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.services.command-canary.loadbalancer.server.port=8080"
+        - "traefik.http.routers.command-router.rule=Method(`POST`, `PUT`, `DELETE`, `PATCH`)"
+        - "traefik.http.routers.command-router.entrypoints=web"
+        - "traefik.http.services.command-service.loadbalancer.server.port=8080"
+
     networks:
       - lms_network
 
@@ -35,7 +40,9 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.services.query-stable.loadbalancer.server.port=8080"
+        - "traefik.http.routers.query-router.rule=Method(`GET`)"
+        - "traefik.http.routers.query-router.entrypoints=web"
+        - "traefik.http.services.query-service.loadbalancer.server.port=8080"
     networks:
       - lms_network
 
@@ -47,7 +54,9 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.services.query-canary.loadbalancer.server.port=8080"
+        - "traefik.http.routers.query-router.rule=Method(`GET`)"
+        - "traefik.http.routers.query-router.entrypoints=web"
+        - "traefik.http.services.query-service.loadbalancer.server.port=8080"
     networks:
       - lms_network
 
