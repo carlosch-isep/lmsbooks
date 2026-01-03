@@ -20,7 +20,7 @@ def deploy(branch) {
 }
 
 def dockerConfig(branch){
-    sh "scp -o StrictHostKeyChecking=no -i ./deployment-resources/ssh_deployment_config *ocker* ${branch}:/opt/books/${branch}"
+    sh "scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config *ocker* ${branch}:/opt/books/${branch}"
 }
 
 return this
