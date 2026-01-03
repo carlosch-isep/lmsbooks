@@ -6,6 +6,14 @@ def release
 pipeline {
     agent any
 
+    parameters {
+        choice(
+            name: 'DEPLOY_ENV',
+            choices: ['Staging', 'Production'],
+            description: 'Para qual ambiente queres fazer o deploy?'
+        )
+    }
+
     stages {
         stage('Prepare') {
             steps {
@@ -102,7 +110,7 @@ pipeline {
         stage("Deploy") {
             steps {
                 script {
-                    deployment.deploy(env.BRANCH_NAME)
+                    deployment.deploy(params.DEPLOY_ENV)
                 }
             }
         }
