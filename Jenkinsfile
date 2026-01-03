@@ -116,7 +116,9 @@ pipeline {
         }
 
         stage("Deploy @ ${env.GIT_BRANCH}") {
-            deployment.deploy(env.GIT_BRANCH)
+            script{
+                deployment.deploy(env.GIT_BRANCH)
+            }
         }
 
         stage('k6 Production Load Tests') {
