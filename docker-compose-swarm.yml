@@ -73,3 +73,4 @@ services:
 networks:
   lms_network:
     driver: overlay
+    external: true
