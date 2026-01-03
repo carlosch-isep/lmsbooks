@@ -3,6 +3,11 @@ def containerPush
 def deployment
 def release
 
+def config = [
+    'Staging':'staging',
+    'Production':'production'
+]
+
 pipeline {
     agent any
 
@@ -117,10 +122,18 @@ pipeline {
             }
         }
 
+        stage("Deploy Docker Struct"){
+            steps{
+                script{
+                    deployment.dockerConfig(config[params.DEPLOY_ENV])
+                }
+            }
+        }
+
         stage("Deploy") {
             steps {
                 script {
-                    deployment.deploy(params.DEPLOY_ENV)
+                    deployment.deploy(config[params.DEPLOY_ENV])
                 }
             }
         }

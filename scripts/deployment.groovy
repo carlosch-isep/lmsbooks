@@ -9,11 +9,6 @@ def deploy(branch) {
         imageTag = "${branch}-${env.BUILD_NUMBER}"
     }
 
-    def config = [
-            'Staging':'staging',
-            'Production':'production'
-    ]
-
     // Set permissions
     sh 'chmod 600 ./deployment-resources/id_rsa_custom'
 
@@ -21,7 +16,11 @@ def deploy(branch) {
     def ssh = "ssh -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config"
 
     // Rollback to tag:
-    sh "${ssh} ${config[branch]} 'cd /opt/books/${config[branch]}/ && IMAGE_TAG=${imageTag} docker compose pull && docker compose up -d'"
+    sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && IMAGE_TAG=${imageTag} docker compose pull && docker compose up -d'"
+}
+
+def dockerConfigFile(branch){
+    def scp = "scp -o StrictHostKeyChecking=no -i ./deployment-resources/ssh_deployment_config *ocker* ${branch}:'/opt/books/${branch}"
 }
 
 return this
