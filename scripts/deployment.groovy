@@ -33,8 +33,15 @@ def deploy(branch, strategy) {
         """
 
         // Make sure network exists
-        """ ${ssh} ${branch} '
-        if ! docker network ls | grep -q "lms_network"; then
+        sh """${ssh} ${branch} '
+        NETWORK_DRIVER=\$(docker network inspect lms_network --format "{{.Driver}}" 2>/dev/null || echo "missing")
+        
+        if [ "\$NETWORK_DRIVER" = "bridge" ]; then
+            docker network rm lms_network || true
+            NETWORK_DRIVER="missing"
+        fi
+
+        if [ "\$NETWORK_DRIVER" != "overlay" ]; then
             docker network create --driver overlay --attachable lms_network
         fi
         '
