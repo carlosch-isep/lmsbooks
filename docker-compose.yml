@@ -1,6 +1,6 @@
 services:
     lmsbooks_1:
-        image: lmsbooks:latest
+        image: carloshenriquesisep/lmsbooks:${IMAGE_TAG:-latest}
         container_name: books_command
         build:
             context: .
@@ -20,7 +20,7 @@ services:
             - "uploaded_files_command:/tmp"
 
     lmsbooks_2:
-        image: lmsbooks:latest
+        image: carloshenriquesisep/lmsbooks:${IMAGE_TAG:-latest}
         container_name: books_query
         build:
             context: .

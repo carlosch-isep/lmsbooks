@@ -15,13 +15,15 @@ def deploy(branch) {
     // SSH init configs
     def ssh = "ssh -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config"
 
+    // Create network
+    sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && docker network create lms_network"
+
     // Rollback to tag:
     sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && IMAGE_TAG=${imageTag} docker compose pull && docker compose up -d'"
 }
 
 def dockerConfig(branch){
     sh 'chmod 600 ./deployment-resources/id_rsa_custom'
-
     sh "scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config *ocker* ${branch}:/opt/books/${branch}"
 }
 
