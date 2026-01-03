@@ -20,7 +20,7 @@ def deploy(branch) {
     sh 'chmod 600 ./deployment-resources/id_rsa_custom'
 
     // SSH init configs
-    def ssh = "ssh -o StrictHostKeyChecking=no -i ./deployment-resources/ssh_deployment_config"
+    def ssh = "ssh -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config"
 
     // Rollback to tag:
     sh "${ssh} ${config[branch]} 'cd opt/books/${config[branch]}/ && IMAGE_TAG=${imageTag} docker compose pull && docker compose up -d'"
