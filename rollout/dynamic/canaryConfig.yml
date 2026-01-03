@@ -14,15 +14,15 @@ http:
     service-command-canary:
       weighted:
         services:
-          - name: staging_books_command@swarm
+          - name: command-stable@swarm
             weight: 90
-          - name: staging_books_command_canary@swarm
+          - name: command-canary@swarm
             weight: 10
 
     service-query-canary:
       weighted:
         services:
-          - name: staging_books_query@swarm
+          - name: query-stable@swarm
             weight: 90
-          - name: staging_books_query_canary@swarm
+          - name: query-canary@swarm
             weight: 10
