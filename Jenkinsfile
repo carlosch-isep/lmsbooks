@@ -55,11 +55,11 @@ pipeline {
         stage('Mutation tests') {
             steps {
                 sh 'mvn org.pitest:pitest-maven:mutationCoverage'
-                utils.publishReport(target: [
+                utils.publishReport(
                         reportDir  : 'target/pit-reports',
                         reportFiles: 'index.html',
                         reportName : 'Mutation Tests (PIT)'
-                ])
+                )
             }
         }
 
@@ -82,22 +82,22 @@ pipeline {
 
         stage('Coverage') {
             steps {
-                utils.publishReport(target: [
+                utils.publishReport(
                         reportDir  : 'target/site/jacoco',
                         reportFiles: 'index.html',
                         reportName : 'JaCoCo Coverage'
-                ])
+                )
             }
         }
 
         stage('Pact Contract Tests') {
             steps {
                 sh 'mvn test -Ppact-provider'
-                utils.publishReport(target: [
+                utils.publishReport(
                         reportDir  : 'target/pacts',
                         reportFiles: '*.html',
                         reportName : 'Pact Contract Tests'
-                ])
+                )
             }
         }
 

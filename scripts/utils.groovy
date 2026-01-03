@@ -14,14 +14,14 @@ def runLoadTest(scriptPath, reportName) {
     sh "k6 run ${scriptPath}"
 
     // Publish the generated HTML
-    publishReport(target: [
+    publishReport(
             allowAntFiles: false,
             alwaysLinkToLastBuild: true,
             keepAll: true,
             reportDir: '.',            // Where summary.html is located
             reportFiles: 'summary.html',
             reportName: "${reportName}"
-    ])
+    )
 }
 
 def publishReport(Map config = [:]) {
