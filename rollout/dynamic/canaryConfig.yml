@@ -3,7 +3,7 @@ http:
   routers:
     # Encaminha POST para o Weighted Service do Command
     router-command:
-      rule: "Host(`lms-isep.ovh`) && Method(`POST`)"
+      rule: "Host(`lms-isep.ovh`) && Method(`POST`, `PUT`, `DELETE`, `PATCH`)"
       service: service-command-canary
       entryPoints: ["web"]
 
