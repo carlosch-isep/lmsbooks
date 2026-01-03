@@ -47,7 +47,7 @@ export default function () {
     },
   };
 
-  let res = http.post('http://localhost:8087/api/command/books', payload, params);
+  let res = http.post('http://lms-isep.ovh:8087/api/command/books', payload, params);
   check(res, { 'created': (r) => r.status === 201 });
   sleep(1);
 }
