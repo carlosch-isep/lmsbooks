@@ -56,9 +56,9 @@ pipeline {
             steps {
                 sh 'mvn org.pitest:pitest-maven:mutationCoverage'
                 utils.publishReport(
-                        reportDir  : 'target/pit-reports',
-                        reportFiles: 'index.html',
-                        reportName : 'Mutation Tests (PIT)'
+                    path: 'target/pit-reports',
+                    file: 'index.html',
+                    name: "Mutation Tests (PIT)"
                 )
             }
         }
@@ -83,9 +83,9 @@ pipeline {
         stage('Coverage') {
             steps {
                 utils.publishReport(
-                        reportDir  : 'target/site/jacoco',
-                        reportFiles: 'index.html',
-                        reportName : 'JaCoCo Coverage'
+                    path: 'target/site/jacoco',
+                    file: 'index.html',
+                    name: "JaCoCo Coverage"
                 )
             }
         }
@@ -94,9 +94,9 @@ pipeline {
             steps {
                 sh 'mvn test -Ppact-provider'
                 utils.publishReport(
-                        reportDir  : 'target/pacts',
-                        reportFiles: '*.html',
-                        reportName : 'Pact Contract Tests'
+                    path: 'target/pacts',
+                    file: '*.html',
+                    name: "Pact Contract Tests"
                 )
             }
         }

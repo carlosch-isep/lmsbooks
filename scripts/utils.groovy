@@ -15,12 +15,9 @@ def runLoadTest(scriptPath, reportName) {
 
     // Publish the generated HTML
     publishReport(
-            allowAntFiles: false,
-            alwaysLinkToLastBuild: true,
-            keepAll: true,
-            reportDir: '.',            // Where summary.html is located
-            reportFiles: 'summary.html',
-            reportName: "${reportName}"
+            path: '.',
+            file: 'summary.html',
+            name: "${reportName}"
     )
 }
 
