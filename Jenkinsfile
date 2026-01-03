@@ -7,6 +7,11 @@ pipeline {
     agent any
 
     parameters {
+        string(
+            name: 'ROLLBACK_TAG',
+            defaultValue: '',
+            description: 'Docker image tag to rollback to (e.g. staging-12)'
+        )
         choice(
             name: 'DEPLOY_ENV',
             choices: ['Staging', 'Production'],
@@ -106,7 +111,7 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     script {
-                        containerPush.containerPush("LMS-${env.BUILD_NUMBER}", DOCKER_USER, DOCKER_PASS)
+                        containerPush.containerPush("LmsBooks-${env.BUILD_NUMBER}", DOCKER_USER, DOCKER_PASS)
                     }
                 }
             }
