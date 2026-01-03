@@ -28,7 +28,7 @@ export default function () {
         },
     };
 
-    const url = 'http://localhost:8088/api/query/books?title=The%20Art%20of%20Clean%20Code';
+    const url = 'http://lms-isep.ovh:8088/api/query/books?title=The Art of Clean Code';
 
     let res = http.get(url, params);
 
