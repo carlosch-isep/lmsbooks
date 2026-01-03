@@ -19,8 +19,8 @@ def deploy(branch) {
     sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && IMAGE_TAG=${imageTag} docker compose pull && docker compose up -d'"
 }
 
-def dockerConfigFile(branch){
-    def scp = "scp -o StrictHostKeyChecking=no -i ./deployment-resources/ssh_deployment_config *ocker* ${branch}:'/opt/books/${branch}"
+def dockerConfig(branch){
+    sh "scp -o StrictHostKeyChecking=no -i ./deployment-resources/ssh_deployment_config *ocker* ${branch}:'/opt/books/${branch}"
 }
 
 return this

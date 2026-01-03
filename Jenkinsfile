@@ -116,7 +116,7 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     script {
-                        containerPush.containerPush("LmsBooks-${env.BUILD_NUMBER}", DOCKER_USER, DOCKER_PASS)
+                        containerPush.containerPush("${config[params.DEPLOY_ENV]}-${env.BUILD_NUMBER}", DOCKER_USER, DOCKER_PASS)
                     }
                 }
             }
