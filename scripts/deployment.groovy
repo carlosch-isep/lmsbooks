@@ -20,6 +20,8 @@ def deploy(branch) {
 }
 
 def dockerConfig(branch){
+    sh 'chmod 600 ./deployment-resources/id_rsa_custom'
+
     sh "scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config *ocker* ${branch}:/opt/books/${branch}"
 }
 
