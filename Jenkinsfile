@@ -18,6 +18,12 @@ pipeline {
             }
         }
 
+        stage('Build') {
+            steps {
+                sh 'mvn package -DskipITs -DskipUTs -DskipTests'
+            }
+        }
+
         stage('Unit Tests') {
             steps {
                 sh 'mvn test -DskipITs'
@@ -32,7 +38,6 @@ pipeline {
 
         stage('Mutation tests') {
             steps {
-                sh 'mvn package -DskipTests'
                 sh 'mvn org.pitest:pitest-maven:mutationCoverage'
                 publishHTML(target: [
                         reportDir  : 'target/pit-reports',
@@ -44,7 +49,9 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                sh "mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=lmsbooks -Dsonar.projectName='lmsbooks' -Dsonar.host.url='http://lms-isep.ovh:9000' -Dsonar.token=sqp_9725d3092dae2c35882ba7b495365296840188b1"
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh "mvn verify -DskipUTs -DskipITs org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=lmsbooks -Dsonar.projectName='lmsbooks' -Dsonar.host.url='http://lms-isep.ovh:9000' -Dsonar.token=${SONAR_TOKEN}"
+                }
             }
         }
 
@@ -79,13 +86,6 @@ pipeline {
             }
         }
 
-        stage('k6 Load Tests') {
-            steps {
-                sh 'k6 run load-tests/smoke/get-books-smoke.js'
-                sh 'k6 run load-tests/smoke/create-book-smoke.js'
-            }
-        }
-
         stage('Deploy @ Staging') {
             when {
                 expression {
@@ -94,7 +94,7 @@ pipeline {
             }
             steps {
                 sh 'chmod 600 ./deployment-resources/id_rsa_custom'
-                sh 'scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-0.0.1-SNAPSHOT.jar staging:/opt/books/staging/LMSBooks-0.0.1-SNAPSHOT.jar'
+                sh 'scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-*.jar staging:/opt/books/staging/LMSBooks.jar'
             }
         }
 
@@ -106,7 +106,19 @@ pipeline {
             }
             steps {
                 sh 'chmod 600 ./deployment-resources/id_rsa_custom'
-                sh 'scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-0.0.1-SNAPSHOT.jar production:/opt/books/main/LMSBooks-0.0.1-SNAPSHOT.jar'
+                sh 'scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-*.jar production:/opt/books/main/LMSBooks.jar'
+            }
+        }
+
+        stage('k6 Production Load Tests') {
+            when {
+                expression {
+                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
+                }
+            }
+            steps {
+                sh 'k6 run load-tests/smoke/get-books-smoke.js'
+                sh 'k6 run load-tests/smoke/create-book-smoke.js'
             }
         }
     }
