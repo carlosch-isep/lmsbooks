@@ -1,6 +1,5 @@
-
 services:
-    postgres_in_lms_network:
+    postgres:
         container_name: postgres_in_lms_network
         image: postgres:latest
         restart: unless-stopped
