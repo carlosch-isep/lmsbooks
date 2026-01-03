@@ -130,8 +130,8 @@ pipeline {
                 script {
                     utils.runLoadTest("load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
                     utils.runLoadTest("load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
+                    currentBuild.result = 'SUCCESS'
                 }
-                currentBuild.result = 'SUCCESS'
             }
         }
     }
