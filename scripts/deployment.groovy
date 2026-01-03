@@ -6,10 +6,8 @@ def deploy(branch) {
     if (params.ROLLBACK_TAG?.trim()) {
         imageTag = params.ROLLBACK_TAG
     } else {
-        imageTag = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+        imageTag = "${branch}-${env.BUILD_NUMBER}"
     }
-
-
 
     def config = [
             'Staging':'staging',
@@ -23,7 +21,7 @@ def deploy(branch) {
     def ssh = "ssh -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config"
 
     // Rollback to tag:
-    sh "${ssh} ${config[branch]} 'cd opt/books/${config[branch]}/ && IMAGE_TAG=${imageTag} docker compose pull && docker compose up -d'"
+    sh "${ssh} ${config[branch]} 'cd /opt/books/${config[branch]}/ && IMAGE_TAG=${imageTag} docker compose pull && docker compose up -d'"
 }
 
 return this

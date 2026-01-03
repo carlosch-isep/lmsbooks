@@ -103,7 +103,7 @@ pipeline {
             }
         }
 
-        stage('CONTAINER IMAGE BUILD & PUSH') {
+        stage('Push container to dockerHub') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub',
