@@ -1,13 +1,29 @@
+def utils
+def containerPush
+def deployment
+def release
+
 pipeline {
     agent any
 
     stages {
+        stage('Prepare') {
+            steps {
+                script {
+                    utils = load 'scripts/utils.groovy'
+                    containerPush = load 'script/container_push.groovy'
+                    deployment = load 'script/deployment.groovy'
+                    release = load 'script/release.groovy'
+                }
+            }
+        }
+
         stage('Initialize') {
             steps {
-                slackSend(
-                    color: '#f0544c',
-                    message: "🚀 *Started:* Job ${env.JOB_NAME} [Build #${env.BUILD_NUMBER}] (<${env.BUILD_URL}|Check Console>)"
-                )
+                script{
+                    utils.sendNotification( '#f0544c',
+                    "🚀 *Started:* Job ${env.JOB_NAME} [Build #${env.BUILD_NUMBER}] (<${env.BUILD_URL}|Check Console>)")
+                }
             }
         }
 
@@ -39,7 +55,7 @@ pipeline {
         stage('Mutation tests') {
             steps {
                 sh 'mvn org.pitest:pitest-maven:mutationCoverage'
-                publishHTML(target: [
+                utils.publishReport(target: [
                         reportDir  : 'target/pit-reports',
                         reportFiles: 'index.html',
                         reportName : 'Mutation Tests (PIT)'
@@ -57,17 +73,16 @@ pipeline {
 
         stage('Manual Approval') {
             steps {
-                slackSend(
-                    color: '#f0544c',
-                    message: "Deploy manual approve needed (<${env.BUILD_URL}|Check Console>)"
-                )
+                script{
+                    utils.sendNotification( '#f0544c',"Deploy manual approve needed (<${env.BUILD_URL}|Check Console>)")
+                }
                 input message: 'Approve deployment?', ok: 'Go On'
             }
         }
 
         stage('Coverage') {
             steps {
-                publishHTML(target: [
+                utils.publishReport(target: [
                         reportDir  : 'target/site/jacoco',
                         reportFiles: 'index.html',
                         reportName : 'JaCoCo Coverage'
@@ -78,7 +93,7 @@ pipeline {
         stage('Pact Contract Tests') {
             steps {
                 sh 'mvn test -Ppact-provider'
-                publishHTML(target: [
+                utils.publishReport(target: [
                         reportDir  : 'target/pacts',
                         reportFiles: '*.html',
                         reportName : 'Pact Contract Tests'
@@ -86,49 +101,42 @@ pipeline {
             }
         }
 
-        stage('Deploy @ Staging') {
-            when {
-                expression {
-                    return env.GIT_BRANCH == 'origin/staging' || env.GIT_BRANCH == 'staging'
-                }
-            }
+        stage('CONTAINER IMAGE BUILD & PUSH') {
             steps {
-                sh 'chmod 600 ./deployment-resources/id_rsa_custom'
-                sh 'scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-*.jar staging:/opt/books/staging/LMSBooks.jar'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    script {
+                        containerPush.containerPush("${env.BRANCH_NAME}-${env.BUILD_NUMBER}",DOCKER_USER, DOCKER_PASS)
+                    }
+                }
             }
         }
 
-        stage('Deploy @ Production') {
-            when {
-                expression {
-                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
-                }
-            }
-            steps {
-                sh 'chmod 600 ./deployment-resources/id_rsa_custom'
-                sh 'scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-*.jar production:/opt/books/main/LMSBooks.jar'
-            }
+        stage("Deploy @ ${env.GIT_BRANCH}") {
+            deployment.deploy(env.GIT_BRANCH)
         }
 
         stage('k6 Production Load Tests') {
-            when {
-                expression {
-                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main'
-                }
-            }
-            steps {
-                sh 'k6 run load-tests/smoke/get-books-smoke.js'
-                sh 'k6 run load-tests/smoke/create-book-smoke.js'
+            script{
+                utils.runLoadTest("load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
+                utils.runLoadTest("load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
             }
         }
     }
 
     post {
-        always {
-            slackSend(
-                color: "${currentBuild.currentResult == 'SUCCESS' ? 'good' : 'danger'}",
-                message: "Build ${env.JOB_NAME} #${env.BUILD_NUMBER}: ${currentBuild.currentResult} (<${env.BUILD_URL}|Open Jenkins>)"
-            )
+        success {
+            script {
+                utils.sendNotification('#f0544c', "Sucesso total! 🚀") // Usando o teu Arch Red
+            }
+        }
+        failure {
+            script {
+                utils.sendNotification('danger', "Algo correu mal... ❌")
+            }
         }
     }
 
