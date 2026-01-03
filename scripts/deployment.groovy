@@ -16,7 +16,7 @@ def deploy(branch) {
     def ssh = "ssh -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config"
 
     // Create network
-    sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && docker network create lms_network'"
+    sh "${ssh} ${branch} 'docker network inspect lms_network >/dev/null 2>&1 || docker network create lms_network'"
 
     // Rollback to tag:
     sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && IMAGE_TAG=${imageTag} docker compose pull && docker compose up -d'"
