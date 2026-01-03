@@ -9,6 +9,8 @@ export let options = {
 
 export default function () {
 
+    const url = __ENV.BASE_URL || 'http://lms-isep.ovh:8088';
+
     const TOKEN = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAiuZ4N2VZ8bo95gLg/tyV' +
         'p6hEaR7NnXqGsPdg7iWVEnHLMEMEpxKKSRqies2xgqJYK+vqdXF5qmIc9arMsKQQ' +
         'wHW8U3uMUtfAE5XMjgX0eUv4MrZOexJViUxgHpWo214J3tq/+hXuuoFnz514q18d' +
@@ -29,9 +31,8 @@ export default function () {
         },
     };
 
-    const url = "http://lms-isep.ovh:8088/api/query/books?title=The";
 
-    let res = http.get(url, params);
+    let res = http.get(`${url}/api/query/books?title=The`, params);
 
     check(res, {
         'status was 200': (r) => r.status === 200,

@@ -9,6 +9,8 @@ export let options = {
 
 export default function () {
 
+  const url = __ENV.BASE_URL || 'http://lms-isep.ovh:8087';
+
   const TOKEN = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAiuZ4N2VZ8bo95gLg/tyV' +
       'p6hEaR7NnXqGsPdg7iWVEnHLMEMEpxKKSRqies2xgqJYK+vqdXF5qmIc9arMsKQQ' +
       'wHW8U3uMUtfAE5XMjgX0eUv4MrZOexJViUxgHpWo214J3tq/+hXuuoFnz514q18d' +
@@ -47,7 +49,7 @@ export default function () {
     },
   };
 
-  let res = http.post('http://lms-isep.ovh:8087/api/command/books', payload, params);
+  let res = http.post(`${url}/api/query/books`, payload, params);
   check(res, { 'created': (r) => r.status === 201 });
   sleep(2);
 }
