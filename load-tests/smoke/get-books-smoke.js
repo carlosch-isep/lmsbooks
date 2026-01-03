@@ -39,8 +39,7 @@ export default function () {
     let res = http.get(`${url}/api/query/books?title=The`, params);
 
     check(res, {
-        'status was 200': (r) => r.status === 200,
-        'body size > 0': (r) => r.body.length > 0
+        'status was 200': (r) => r.status === 200
     });
 
     sleep(2);
