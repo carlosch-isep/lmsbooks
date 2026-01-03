@@ -49,7 +49,7 @@ export default function () {
 
   let res = http.post('http://lms-isep.ovh:8087/api/command/books', payload, params);
   check(res, { 'created': (r) => r.status === 201 });
-  sleep(1);
+  sleep(2);
 }
 
 // Create Report
