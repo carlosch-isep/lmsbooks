@@ -142,8 +142,8 @@ pipeline {
             steps {
                 script {
                     try {
-                        utils.runLoadTest("load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
-                        utils.runLoadTest("load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
+                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8088 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
+                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8087 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
                     } finally {
                         currentBuild.result = 'SUCCESS'
                     }

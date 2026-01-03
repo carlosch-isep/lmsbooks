@@ -9,7 +9,7 @@ def sendNotification(color, message) {
 
 def runLoadTest(scriptPath, reportName) {
     try {
-        sh "k6 run ${scriptPath}"
+        sh "k6 run -e ${scriptPath}"
     } catch (Exception e) {
         echo "⚠️ O k6 falhou (talvez um threshold?), mas vamos publicar o relatório na mesma.: ${e}"
     } finally {
