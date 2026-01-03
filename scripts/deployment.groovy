@@ -18,6 +18,12 @@ def deploy(branch) {
     // Create network
     sh "${ssh} ${branch} 'docker network inspect lms_network >/dev/null 2>&1 || docker network create lms_network'"
 
+    // Start mongo and postgres
+    sh "${ssh} ${branch} 'cd /opt/books/staging/ && docker compose -f docker-compose-mongodb+postgres.yml up -d --no-recreate --remove-orphans'"
+
+    // copy target/LMSBooks-0.0.1-SNAPSHOT.jar
+    sh "scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-0.0.1-SNAPSHOT.jar ${branch}:/opt/books/${branch}/target/LMSBooks-0.0.1-SNAPSHOT.jar"
+
     // Rollback to tag:
     sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && IMAGE_TAG=${imageTag} docker compose pull && docker compose up -d'"
 }
