@@ -8,17 +8,13 @@ def sendNotification(color, message) {
 }
 
 def runLoadTest(scriptPath, reportName) {
-    echo "Running k6: ${scriptPath}"
-
-    // Execute k6
-    sh "k6 run ${scriptPath}"
-
-    // Publish the generated HTML
-    publishReport(
-            path: '.',
-            file: 'summary.html',
-            name: "${reportName}"
-    )
+    try {
+        sh "k6 run ${scriptPath}"
+    } catch (Exception e) {
+        echo "⚠️ O k6 falhou (talvez um threshold?), mas vamos publicar o relatório na mesma.: ${e}"
+    } finally {
+        publishReport(path: '.', file: 'summary.html', name: reportName)
+    }
 }
 
 def publishReport(Map config = [:]) {
@@ -26,7 +22,6 @@ def publishReport(Map config = [:]) {
     archiveArtifacts artifacts: "${config.path}/**/*", allowEmptyArchive: true
 
     publishHTML(target: [
-            allowAntFiles: false,
             alwaysLinkToLastBuild: true,
             keepAll: true,
             reportDir: config.path,

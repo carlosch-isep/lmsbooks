@@ -42,9 +42,14 @@ pipeline {
             }
         }
 
-        stage('Build & Tests') {
+        stage('Build') {
             steps {
                 sh 'mvn package -DskipTests'
+            }
+        }
+
+        stage('Tests') {
+            steps {
                 sh 'mvn test -DskipITs'
                 sh 'mvn verify -DskipUTs'
             }
@@ -101,7 +106,7 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     script {
-                        containerPush.containerPush("${env.BRANCH_NAME}-${env.BUILD_NUMBER}", DOCKER_USER, DOCKER_PASS)
+                        containerPush.containerPush("LMS-${env.BUILD_NUMBER}", DOCKER_USER, DOCKER_PASS)
                     }
                 }
             }

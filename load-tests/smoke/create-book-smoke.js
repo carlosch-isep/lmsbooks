@@ -1,5 +1,6 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 
 export let options = {
   vus: 1,
@@ -49,4 +50,11 @@ export default function () {
   let res = http.post('http://localhost:8087/api/command/books', payload, params);
   check(res, { 'created': (r) => r.status === 201 });
   sleep(1);
+}
+
+// Create Report
+export function handleSummary(data) {
+  return {
+    "summary.html": htmlReport(data),
+  };
 }
