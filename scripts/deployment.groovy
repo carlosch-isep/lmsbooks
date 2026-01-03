@@ -48,7 +48,7 @@ def deploy(branch, strategy) {
         sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && TRAEFIK_PORT=8070 docker stack deploy -c docker-compose-traefik.yml proxy'"
 
         // Stack
-        sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && IMAGE_TAG=${imageTag} docker stack deploy -c docker-compose-swarm.yml ${branch} --with-registry-auth'"
+        sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && IMAGE_TAG=${imageTag} STABLE_TAG=${imageTag} docker stack deploy -c docker-compose-swarm.yml ${branch} --with-registry-auth'"
     }
 }
 

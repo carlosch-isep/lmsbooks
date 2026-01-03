@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # --- COMMAND (POST) ---
   books_command:
-    image: carloshenriquesisep/lmsbooks:v1.0.0
+    image: carloshenriquesisep/lmsbooks:${STABLE_TAG:-v1.0.0}
     environment:
       - SPRING_PROFILES_ACTIVE=command
       - SPRING_DATA_MONGODB_HOST=mongodb
@@ -29,7 +29,7 @@ services:
 
   # --- QUERY (GET) ---
   books_query:
-    image: carloshenriquesisep/lmsbooks:v1.0.0
+    image: carloshenriquesisep/lmsbooks:${STABLE_TAG:-v1.0.0}
     environment:
       - SPRING_PROFILES_ACTIVE=query
       - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
