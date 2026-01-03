@@ -19,7 +19,7 @@ pipeline {
         )
         choice(
             name: 'DEPLOY_STRATEGY',
-            choice: ['SWITCH', 'CANARY'],
+            choices: ['Switch', 'Canary'],
             description: 'Select the deploy strategy'
         )
     }
