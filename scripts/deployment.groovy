@@ -15,11 +15,9 @@ def deploy(branch, strategy) {
     // SSH init configs
     def ssh = "ssh -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config"
 
-    // Create network
-    sh "${ssh} ${branch} 'docker network inspect lms_network >/dev/null 2>&1 || docker network create lms_network'"
-
     if(strategy == 'Switch'){
         // --- INIT SWITCH VERSION
+        sh "${ssh} ${branch} 'docker network inspect lms_network >/dev/null 2>&1 || docker network create lms_network'"
         sh "scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-0.0.1-SNAPSHOT.jar ${branch}:/opt/books/${branch}/target/LMSBooks-0.0.1-SNAPSHOT.jar"
         sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && docker rm -f books_query books_command'"
         sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && IMAGE_TAG=${imageTag} docker compose pull && docker compose up -d'"
