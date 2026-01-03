@@ -27,7 +27,7 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.command-router.rule=Method(`POST`, `PUT`, `DELETE`, `PATCH`)"
         - "traefik.http.routers.command-router.entrypoints=web"
-        - "traefik.http.routers.command-router.service=command-service"
+        - "traefik.http.routers.command-router.service=command-canary"
         - "traefik.http.services.command-service.loadbalancer.server.port=8080"
 
     networks:
@@ -59,7 +59,7 @@ services:
         - "traefik.enable=true"
         - "traefik.http.routers.query-router.rule=Method(`GET`)"
         - "traefik.http.routers.query-router.entrypoints=web"
-        - "traefik.http.routers.query-router.service=query-service"
+        - "traefik.http.routers.query-router.service=query-canary"
         - "traefik.http.services.query-service.loadbalancer.server.port=8080"
     networks:
       - lms_network
