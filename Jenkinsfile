@@ -131,6 +131,9 @@ pipeline {
     }
 
     post {
+        unstable {
+            script { utils.sendNotification('#ffcc00', "Build com avisos (k6), mas o Deploy foi feito! ⚠️") }
+        }
         success {
             script { utils.sendNotification('#f0544c', "Sucesso total! 🚀") }
         }

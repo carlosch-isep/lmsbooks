@@ -12,6 +12,7 @@ def runLoadTest(scriptPath, reportName) {
         sh "k6 run ${scriptPath}"
     } catch (Exception e) {
         echo "⚠️ O k6 falhou (talvez um threshold?), mas vamos publicar o relatório na mesma.: ${e}"
+        currentBuild.result = 'UNSTABLE'
     } finally {
         publishReport(path: '.', file: 'summary.html', name: reportName)
     }
