@@ -14,7 +14,7 @@ def runLoadTest(scriptPath, reportName) {
 
 def publishReport(Map config = [:]) {
     // allow permanet link to last build
-    archiveArtifacts artifacts: "${config.path}/**/*", allowEmptyArchive: true
+    archiveArtifacts artifacts: "${config.path}/**/*", allowEmptyArchive: true, fingerprint: true
 
     publishHTML(target: [
             alwaysLinkToLastBuild: true,
