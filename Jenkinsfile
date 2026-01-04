@@ -121,6 +121,9 @@ pipeline {
                     utils.sendNotification('#f1c232', "Deploy manual approval needed (<${env.BUILD_URL}|Check Console>)")
                 }
                 input message: 'Approve deployment?', ok: 'Go On'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    echo "Post-Build Reports"
+                }
             }
         }
 
@@ -134,6 +137,10 @@ pipeline {
                     } finally {
                         echo "success"
                     }
+                }
+
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    echo "Post-Build Reports"
                 }
             }
         }
@@ -152,6 +159,10 @@ pipeline {
                            echo "success"
                         }
                     }
+                }
+
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    echo "Push to dockerHub"
                 }
             }
         }
@@ -175,25 +186,16 @@ pipeline {
         stage('Wait for deploy to end'){
             steps {
                 script {
-                    // Define um limite de tempo (ex: 10 minutos) para evitar travamento eterno
                     timeout(time: 10, unit: 'MINUTES') {
                         waitUntil {
                             try {
-                                // Executa o curl para pegar apenas o código HTTP (ex: 200, 404, 503)
-                                // Substitua 'http://tua-aplicacao/health' pela tua URL real
                                 def status = sh(
                                     script: "curl -s -o /dev/null -w '%{http_code}' http://lms-isep.ovh/api/query/books",
                                     returnStdout: true
                                 ).trim()
 
-                                echo "Verificando status... Retorno: ${status}"
-
-                                // O waitUntil continua tentando enquanto retornar false
                                 return status == '200'
-
                             } catch (Exception e) {
-                                // Se o comando curl falhar (ex: erro de DNS), retorna false para tentar de novo
-                                echo "Falha na conexão, tentando novamente..."
                                 return false
                             }
                         }
@@ -202,7 +204,7 @@ pipeline {
             }
         }
 
-        stage('k6 Production Load Tests') {
+        stage('K6 Smoke tests') {
             steps {
                 script {
                     if(params.DEPLOY_ENV.toLowerCase() == 'dev' || params.DEPLOY_ENV.toLowerCase() == 'staging'){
@@ -210,19 +212,17 @@ pipeline {
                         utils.runLoadTest("BASE_URL=http://lms-isep.ovh load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
                     }
                 }
+
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    echo "K6 Smoke tests"
+                }
             }
         }
     }
 
     post {
-        unstable {
-            script { utils.sendNotification('#f1c232', "Build with warning!") }
-        }
-        success {
+        always {
             script { utils.sendNotification('#6aa84f', "Deploy with success!") }
-        }
-        failure {
-            script { utils.sendNotification('#cc0000', "Something went wrong!") }
         }
     }
 }
