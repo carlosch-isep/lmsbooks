@@ -96,15 +96,29 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
+                    echo "⏳ A verificar Quality Gate (Manual)..."
                     sleep 10
+
+                    // Faz o pedido à API
                     def response = sh(
-                        script: """
-                            curl -s -u ${SONAR_TOKEN_LMSBOOK}: \
-                            'http://lms-isep.ovh:9000/api/qualitygates/project_status?projectKey=lmsbooks'
-                        """,
+                        script: "curl -s -u ${SONAR_TOKEN_LMSBOOK}: 'http://lms-isep.ovh:9000/api/qualitygates/project_status?projectKey=lmsbooks'",
                         returnStdout: true
                     ).trim()
 
+                    echo "🔎 Status recebido: ${response}"
+
+                    // Lógica de proteção contra falhas
+                    if (response.contains('"status":"OK"')) {
+                        echo "✅ Quality Gate: Verde"
+                    } else if (response.contains('"status":"ERROR"')) {
+                        echo "⚠️ Quality Gate: Vermelho (Critérios não atingidos)"
+                        // Isto impede o pipeline de falhar totalmente
+                        currentBuild.result = 'UNSTABLE'
+                    } else {
+                        // Caso o curl falhe ou dê erro de rede
+                        echo "❓ Não foi possível ler o status. Resposta estranha."
+                        currentBuild.result = 'UNSTABLE'
+                    }
                 }
             }
         }
