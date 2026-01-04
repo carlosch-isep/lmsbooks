@@ -11,6 +11,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.command-stable.loadbalancer.server.port=8080"
+        - "traefik.docker.network=lms_network"
     networks:
       - lms_network
 
@@ -23,6 +24,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.command-canary.loadbalancer.server.port=8080"
+        - "traefik.docker.network=lms_network"
 
     networks:
       - lms_network
@@ -37,6 +39,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.query-stable.loadbalancer.server.port=8080"
+        - "traefik.docker.network=lms_network"
     networks:
       - lms_network
 
@@ -49,6 +52,7 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.query-canary.loadbalancer.server.port=8080"
+        - "traefik.docker.network=lms_network"
     networks:
       - lms_network
 
