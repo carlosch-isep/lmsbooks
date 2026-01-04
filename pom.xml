@@ -30,6 +30,11 @@
 
 		<PACT_FOLDER>./target/pacts</PACT_FOLDER>
 
+		<!-- sh "mvn verify -DskipUTs -DskipITs sonar:sonar -Dsonar.token=${SONAR_TOKEN}"-->
+		<sonar.organization>default-organization</sonar.organization>
+		<sonar.projectKey>lmsbooks</sonar.projectKey>
+		<sonar.host.url>http://lms-isep.ovh:9000</sonar.host.url>
+
 	</properties>
 
 	<dependencies>
@@ -303,7 +308,11 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>5.0.0.4389</version>
+			</plugin>
 		</plugins>
 	</build>
 	<profiles>
