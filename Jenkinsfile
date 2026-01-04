@@ -43,8 +43,8 @@ pipeline {
         stage('Initialize') {
             steps {
                 script {
-                    utils.sendNotification('#f0544c',
-                    "🚀 *Started:* Job ${env.JOB_NAME} [Build #${env.BUILD_NUMBER}] (<${env.BUILD_URL}|Check Console>)")
+                    utils.sendNotification('#2986cc',
+                    "*Started:* Job ${env.JOB_NAME} [Build #${env.BUILD_NUMBER}] (<${env.BUILD_URL}|Check Console>)")
                 }
             }
         }
@@ -105,18 +105,10 @@ pipeline {
                         returnStdout: true
                     ).trim()
 
-                    echo "🔎 Status recebido: ${response}"
-
                     // Lógica de proteção contra falhas
                     if (response.contains('"status":"OK"')) {
-                        echo "✅ Quality Gate: Verde"
-                    } else if (response.contains('"status":"ERROR"')) {
-                        echo "⚠️ Quality Gate: Vermelho (Critérios não atingidos)"
-                        // Isto impede o pipeline de falhar totalmente
-                        currentBuild.result = 'UNSTABLE'
+                        echo "Quality gate: OK"
                     } else {
-                        // Caso o curl falhe ou dê erro de rede
-                        echo "❓ Não foi possível ler o status. Resposta estranha."
                         currentBuild.result = 'UNSTABLE'
                     }
                 }
@@ -126,7 +118,7 @@ pipeline {
         stage('Manual Approval') {
             steps {
                 script {
-                    utils.sendNotification('#f0544c', "⚠️ Deploy manual approval needed (<${env.BUILD_URL}|Check Console>)")
+                    utils.sendNotification('#f1c232', "Deploy manual approval needed (<${env.BUILD_URL}|Check Console>)")
                 }
                 input message: 'Approve deployment?', ok: 'Go On'
             }
@@ -190,13 +182,13 @@ pipeline {
 
     post {
         unstable {
-            script { utils.sendNotification('#ffcc00', "Build com avisos (k6), mas o Deploy foi feito! ⚠️") }
+            script { utils.sendNotification('#f1c232', "Build with warning!") }
         }
         success {
-            script { utils.sendNotification('#f0544c', "Sucesso total! 🚀") }
+            script { utils.sendNotification('#6aa84f', "Deploy with success!") }
         }
         failure {
-            script { utils.sendNotification('danger', "Algo correu mal... ❌") }
+            script { utils.sendNotification('#cc0000', "Something went wrong!") }
         }
     }
 }
