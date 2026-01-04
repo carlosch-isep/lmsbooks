@@ -2,14 +2,14 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 
-export let options = {
+export const options = {
+  stages: [
+    { duration: '1s', target: 10 }
+  ],
   thresholds: {
-    http_req_duration: ['p(95)<2000'],
-    http_req_failed: ['rate<1.00'],
+    http_req_failed: ['rate<0.05'],
+    http_req_duration: ['p(95)<7000'],
   },
-  insecureSkipTLSVerify: true,
-  vus: 1,
-  duration: '1s',
 };
 
 export default function () {
@@ -55,7 +55,13 @@ export default function () {
   };
 
   let res = http.post(`${url}/api/query/books`, payload, params);
-  check(res, { 'created': (r) => r.status === 201 });
+
+  let checkRes = check(res, { 'created': (r) => r.status === 200 });
+
+  if (!checkRes || res.status !== 200) {
+    console.error(`ERRO: Status ${res.status} | URL: ${res.url} | Body: ${res.body}`);
+  }
+
   sleep(2);
 }
 

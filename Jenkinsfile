@@ -176,8 +176,8 @@ pipeline {
             steps {
                 script {
                     if(params.DEPLOY_ENV.toLowerCase() == 'dev' || params.DEPLOY_ENV.toLowerCase() == 'staging'){
-                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
-                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
+                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
+                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
                     }
                 }
             }

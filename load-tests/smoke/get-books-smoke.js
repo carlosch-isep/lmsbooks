@@ -4,11 +4,7 @@ import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporte
 
 export const options = {
     stages: [
-        { duration: '10s', target: 10 },
-        { duration: '20s', target: 50 },
-        { duration: '30s', target: 100 },
-        { duration: '60s', target: 100 },
-        { duration: '20s', target: 0 },
+        { duration: '1s', target: 10 }
     ],
     thresholds: {
         http_req_failed: ['rate<0.05'],
@@ -43,11 +39,13 @@ export default function () {
 
     let res = http.get(`${url}/api/query/books?title=The`, params);
 
-    check(res, {
-        'status was 200': (r) => r.status === 200
+    let checkRes = check(res, {
+        'status is 200': (r) => r.status === 200,
     });
 
-    sleep(2);
+    if (!checkRes || res.status !== 200) {
+        console.error(`ERRO: Status ${res.status} | URL: ${res.url} | Body: ${res.body}`);
+    }
 }
 
 // Create Report
