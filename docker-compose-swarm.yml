@@ -8,6 +8,7 @@ services:
       - SPRING_PROFILES_ACTIVE=command
       - SPRING_DATA_MONGODB_HOST=mongodb
     deploy:
+      endpoint_mode: dnsrr
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.command-stable.loadbalancer.server.port=8080"
@@ -21,6 +22,7 @@ services:
       - SPRING_PROFILES_ACTIVE=command
       - SPRING_DATA_MONGODB_HOST=mongodb
     deploy:
+      endpoint_mode: dnsrr
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.command-canary.loadbalancer.server.port=8080"
@@ -36,6 +38,7 @@ services:
       - SPRING_PROFILES_ACTIVE=query
       - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
     deploy:
+      endpoint_mode: dnsrr
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.query-stable.loadbalancer.server.port=8080"
@@ -49,6 +52,7 @@ services:
       - SPRING_PROFILES_ACTIVE=query
       - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
     deploy:
+      endpoint_mode: dnsrr
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.query-canary.loadbalancer.server.port=8080"
