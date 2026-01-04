@@ -127,9 +127,13 @@ pipeline {
         stage('Post-Build Reports') {
             steps {
                 script {
-                    utils.publishReport(path: 'target/reports', file: 'surefire.html', name: "Surefire Coverage")
-                    sh 'mvn test -Ppact-provider -Dpact.writer.strategy=pactfile -Dpact.reports.path=target/pacts/reports'
-                    utils.publishReport(path: 'target/pacts', file: '*.json', name: "Pact Contract Tests")
+                    try {
+                        utils.publishReport(path: 'target/reports', file: 'surefire.html', name: "Surefire Coverage")
+                        sh 'mvn test -Ppact-provider -Dpact.writer.strategy=pactfile -Dpact.reports.path=target/pacts/reports'
+                        utils.publishReport(path: 'target/pacts', file: '*.json', name: "Pact Contract Tests")
+                    } finally {
+                        echo "success"
+                    }
                 }
             }
         }
@@ -171,7 +175,7 @@ pipeline {
         stage('k6 Production Load Tests') {
             steps {
                 script {
-                    if(params.DEPLOY_ENV.toLowerCase() == 'dev'){
+                    if(params.DEPLOY_ENV.toLowerCase() == 'dev' || params.DEPLOY_ENV.toLowerCase() == 'staging'){
                         utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
                         utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
                     }

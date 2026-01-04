@@ -14,7 +14,7 @@ export let options = {
 
 export default function () {
 
-  const url = __ENV.BASE_URL || 'http://lms-isep.ovh:8070';
+  const url = __ENV.BASE_URL || 'http://lms-isep.ovh';
 
   const TOKEN = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAiuZ4N2VZ8bo95gLg/tyV' +
       'p6hEaR7NnXqGsPdg7iWVEnHLMEMEpxKKSRqies2xgqJYK+vqdXF5qmIc9arMsKQQ' +

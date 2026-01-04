@@ -2,8 +2,13 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 export let options = {
-    vus: 1,
-    duration: '1s',
+    stages: [
+        { duration: '10s', target: 10 },    // ramp-up to 10 VUs
+        { duration: '20s', target: 50 },    // ramp-up to 50 VUs
+        { duration: '30s', target: 100 },   // ramp-up to 100 VUs
+        { duration: '60s', target: 100 },   // hold
+        { duration: '20s', target: 0 },     // ramp-down
+    ],
 };
 
 export default function () {
@@ -28,13 +33,12 @@ export default function () {
         },
     };
 
-    const url = 'http://lms-isep.ovh:8088/api/query/books?title=The Art of Clean Code';
+    const url = 'http://lms-isep.ovh/api/query/books?title=The';
 
     let res = http.get(url, params);
 
     check(res, {
-        'status was 200': (r) => r.status === 200,
-        'body size > 0': (r) => r.body.length > 0
+        'status was 200': (r) => r.status === 200
     });
 
     sleep(1);

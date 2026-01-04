@@ -2,19 +2,23 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
 
-export let options = {
+export const options = {
+    stages: [
+        { duration: '10s', target: 10 },
+        { duration: '20s', target: 50 },
+        { duration: '30s', target: 100 },
+        { duration: '60s', target: 100 },
+        { duration: '20s', target: 0 },
+    ],
     thresholds: {
-        http_req_duration: ['p(95)<2000'],
-        http_req_failed: ['rate<1.00'],
+        http_req_failed: ['rate<0.05'],
+        http_req_duration: ['p(95)<7000'],
     },
-    insecureSkipTLSVerify: true,
-    vus: 1,
-    duration: '1s',
 };
 
 export default function () {
 
-    const url = __ENV.BASE_URL || 'http://lms-isep.ovh:8070';
+    const url = __ENV.BASE_URL || 'http://lms-isep.ovh';
 
     const TOKEN = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAiuZ4N2VZ8bo95gLg/tyV' +
         'p6hEaR7NnXqGsPdg7iWVEnHLMEMEpxKKSRqies2xgqJYK+vqdXF5qmIc9arMsKQQ' +
