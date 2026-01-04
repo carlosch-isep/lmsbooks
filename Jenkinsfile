@@ -122,7 +122,7 @@ pipeline {
                 }
                 input message: 'Approve deployment?', ok: 'Go On'
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    echo "Post-Build Reports"
+                    echo "Post-Build Reports catchError"
                 }
             }
         }
@@ -140,7 +140,7 @@ pipeline {
                 }
 
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    echo "Post-Build Reports"
+                    echo "Post-Build Reports catchError"
                 }
             }
         }
@@ -162,7 +162,7 @@ pipeline {
                 }
 
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    echo "Push to dockerHub"
+                    echo "Push to dockerHub catchError"
                 }
             }
         }
@@ -214,7 +214,7 @@ pipeline {
                 }
 
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    echo "K6 Smoke tests"
+                    echo "K6 Smoke tests catchError"
                 }
             }
         }
