@@ -59,7 +59,7 @@ def deploy(branch, strategy) {
         sh "${ssh} ${branch} 'docker stack rm ${branch}'"
 
         // Var env
-        def varEnv = config[branch].collect { k, v -> "export ${k}=${v}" }.join(";")
+        def varEnv = config[branch].collect { k, v -> " ${k}=${v}" }.join(" ")
 
         // Stack
         sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && ${varEnv} docker stack deploy -c docker-compose-swarm.yml ${branch} --with-registry-auth'"
