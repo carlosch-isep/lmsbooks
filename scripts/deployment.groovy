@@ -9,6 +9,12 @@ def deploy(branch, strategy) {
         imageTag = "${branch}-${env.BUILD_NUMBER}"
     }
 
+    def config = [
+        dev: ["CADDY_HTTP_PORT": "18080", "CADDY_HTTPS_PORT": "18443", "STABLE_TAG" : imageTag, "IMAGE_TAG": imageTag],
+        staging:  ["CADDY_HTTP_PORT": "8080", "CADDY_HTTPS_PORT": "8443", "STABLE_TAG" : imageTag, "IMAGE_TAG": imageTag],
+        production: ["CADDY_HTTP_PORT": "80", "CADDY_HTTPS_PORT": "443", "STABLE_TAG" : imageTag, "IMAGE_TAG": imageTag]
+    ]
+
     // Set permissions
     sh 'chmod 600 ./deployment-resources/id_rsa_custom'
 
@@ -52,8 +58,11 @@ def deploy(branch, strategy) {
         // Remove previous stack
         sh "${ssh} ${branch} 'docker stack rm ${branch}'"
 
+        // Var env
+        def varEnv = config[branch].collect { k, v -> "export ${k}=${v}" }.join(";")
+
         // Stack
-        sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && IMAGE_TAG=${imageTag} STABLE_TAG=${imageTag} docker stack deploy -c docker-compose-swarm.yml ${branch} --with-registry-auth'"
+        sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && ${varEnv} docker stack deploy -c docker-compose-swarm.yml ${branch} --with-registry-auth'"
     }
 }
 

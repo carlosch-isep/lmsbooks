@@ -5,8 +5,8 @@ services:
   caddy:
     image: lucaslorentz/caddy-docker-proxy:ci-alpine
     ports:
-      - "80:80"
-      - "443:443"
+      - "${CADDY_HTTP_PORT:-80}:80"
+      - "${CADDY_HTTPS_PORT:-443}:443"
     networks:
       - lms_network
     environment:
@@ -28,7 +28,6 @@ services:
       - SPRING_DATA_MONGODB_HOST=mongodb
     deploy:
       labels:
-        # CORREÇÃO AQUI: Adicionado "http://" para desativar SSL
         caddy: "http://lms.localhost"
 
         # Matcher para métodos de escrita
@@ -59,10 +58,8 @@ services:
       - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
     deploy:
       labels:
-        # CORREÇÃO AQUI: Adicionado "http://" para desativar SSL
         caddy: "http://lms.localhost"
 
-        # Matcher para métodos de leitura
         caddy.@query.method: "GET HEAD"
         caddy.handle: "@query"
 
