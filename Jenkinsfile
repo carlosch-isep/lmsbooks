@@ -161,12 +161,8 @@ pipeline {
         stage('k6 Production Load Tests') {
             steps {
                 script {
-                    try {
-                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
-                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
-                    } finally {
-                        currentBuild.result = 'SUCCESS'
-                    }
+                    utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
+                    utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
                 }
             }
         }
