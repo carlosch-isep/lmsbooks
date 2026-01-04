@@ -6,6 +6,10 @@ def release
 pipeline {
     agent any
 
+    environment {
+        SONAR_TOKEN_LMSBOOK = credentials('SONAR_TOKEN_LMSBOOK')
+    }
+
     parameters {
         string(
             name: 'ROLLBACK_TAG',
