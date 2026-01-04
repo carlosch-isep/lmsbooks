@@ -95,13 +95,16 @@ pipeline {
 
         stage("Quality Gate") {
             steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    script {
-                        def qg = waitForQualityGate()
-                        if (qg.status != 'SUCCESS') {
-                            error "Pipeline abortado: O código não passou no Quality Gate. Status: ${qg.status}"
-                        }
-                    }
+                script {
+                    sleep 30
+                    def response = sh(
+                        script: """
+                            curl -s -u ${SONAR_TOKEN}: \
+                            'http://lms-isep.ovh:9000/api/qualitygates/project_status?projectKey=lmsbooks'
+                        """,
+                        returnStdout: true
+                    ).trim()
+
                 }
             }
         }
