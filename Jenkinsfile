@@ -96,7 +96,7 @@ pipeline {
         stage("Quality Gate") {
             steps {
                 script {
-                    sleep 30
+                    sleep 10
                     def response = sh(
                         script: """
                             curl -s -u ${SONAR_TOKEN_LMSBOOK}: \
@@ -162,8 +162,8 @@ pipeline {
             steps {
                 script {
                     try {
-                        utils.runLoadTest("BASE_URL=https://webhook.site/8da3f744-da0e-4725-83c0-04f3ddadbec9 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
-                        utils.runLoadTest("BASE_URL=https://webhook.site/8da3f744-da0e-4725-83c0-04f3ddadbec9 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
+                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
+                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
                     } finally {
                         currentBuild.result = 'SUCCESS'
                     }

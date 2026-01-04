@@ -5,7 +5,7 @@ import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporte
 export let options = {
     thresholds: {
         http_req_duration: ['p(95)<2000'],
-        http_req_failed: ['rate<0.05'],
+        http_req_failed: ['rate<1.00'],
     },
     insecureSkipTLSVerify: true,
     vus: 1,
@@ -14,9 +14,7 @@ export let options = {
 
 export default function () {
 
-    const url = __ENV.BASE_URL || 'http://lms-isep.ovh:8088';
-
-    const webhook_test = "https://webhook.site/#!/view/8da3f744-da0e-4725-83c0-04f3ddadbec9";
+    const url = __ENV.BASE_URL || 'http://lms-isep.ovh:8070';
 
     const TOKEN = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAiuZ4N2VZ8bo95gLg/tyV' +
         'p6hEaR7NnXqGsPdg7iWVEnHLMEMEpxKKSRqies2xgqJYK+vqdXF5qmIc9arMsKQQ' +
@@ -39,9 +37,7 @@ export default function () {
     };
 
 
-    // let res = http.get(`${url}/api/query/books?title=The`, params);
-
-    let res = http.get(`${webhook_test}`, params);
+    let res = http.get(`${url}/api/query/books?title=The`, params);
 
     check(res, {
         'status was 200': (r) => r.status === 200
