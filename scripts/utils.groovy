@@ -8,13 +8,21 @@ def sendNotification(color, message) {
 }
 
 def runLoadTest(scriptPath, reportName) {
-    try {
-        sh "k6 run -e ${scriptPath}"
-    } catch (Exception e) {
-        echo "⚠️ O k6 falhou (talvez um threshold?), mas vamos publicar o relatório na mesma.: ${e}"
-    } finally {
-        publishReport(path: '.', file: 'summary.html', name: reportName)
+    int exitCode = sh(script: "k6 run -e ${scriptPath}", returnStatus: true )
+
+    publishReport(path: '.', file: 'summary.html', name: reportName)
+
+    if (exitCode == 99) {
+        echo "⚠️ Thresholds do k6 não foram atingidos (Exit Code 99)."
+        // Define o build como Amarelo no Jenkins
+        currentBuild.result = 'UNSTABLE'
+    } else if (exitCode != 0) {
+        // Se for qualquer outro erro (1, 100, etc), o pipeline deve parar mesmo
+        error "❌ O k6 terminou com um erro crítico (Código: ${exitCode})."
+    } else {
+        echo "✅ Testes de carga passaram em todos os thresholds!"
     }
+
 }
 
 def publishReport(Map config = [:]) {
