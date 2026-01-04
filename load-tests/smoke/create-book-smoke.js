@@ -7,6 +7,7 @@ export let options = {
     http_req_duration: ['p(95)<2000'],
     http_req_failed: ['rate<0.05'],
   },
+  insecureSkipTLSVerify: true,
   vus: 1,
   duration: '1s',
 };
@@ -14,6 +15,7 @@ export let options = {
 export default function () {
 
   const url = __ENV.BASE_URL || 'http://lms-isep.ovh:8087';
+  const webhook_test = "https://webhook.site/#!/view/8da3f744-da0e-4725-83c0-04f3ddadbec9";
 
   const TOKEN = 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAiuZ4N2VZ8bo95gLg/tyV' +
       'p6hEaR7NnXqGsPdg7iWVEnHLMEMEpxKKSRqies2xgqJYK+vqdXF5qmIc9arMsKQQ' +
@@ -53,7 +55,9 @@ export default function () {
     },
   };
 
-  let res = http.post(`${url}/api/query/books`, payload, params);
+  let res = http.post(`${webhook_test}/api/query/books`, payload , params);
+
+  // let res = http.post(`${url}/api/query/books`, payload, params);
   check(res, { 'created': (r) => r.status === 201 });
   sleep(2);
 }
