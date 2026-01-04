@@ -47,6 +47,8 @@ def deploy(branch, strategy) {
         '
         """
 
+        sh "${ssh} ${branch} 'docker stack rm ${branch}'"
+
         sh "scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-0.0.1-SNAPSHOT.jar ${branch}:/opt/books/${branch}/target/LMSBooks-0.0.1-SNAPSHOT.jar"
 
         // Stack
