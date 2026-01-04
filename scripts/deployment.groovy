@@ -49,9 +49,6 @@ def deploy(branch, strategy) {
 
         sh "scp -o StrictHostKeyChecking=no -F ./deployment-resources/ssh_deployment_config target/LMSBooks-0.0.1-SNAPSHOT.jar ${branch}:/opt/books/${branch}/target/LMSBooks-0.0.1-SNAPSHOT.jar"
 
-        // Proxy
-        sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && TRAEFIK_PORT=8070 docker stack deploy -c docker-compose-traefik.yml proxy'"
-
         // Stack
         sh "${ssh} ${branch} 'cd /opt/books/${branch}/ && IMAGE_TAG=${imageTag} STABLE_TAG=${imageTag} docker stack deploy -c docker-compose-swarm.yml ${branch} --with-registry-auth'"
     }

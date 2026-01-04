@@ -1,18 +1,45 @@
 version: '3.8'
 
 services:
-  # --- COMMAND (POST) ---
+  # --- O PROXY (Caddy) ---
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:ci-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - lms_network
+    environment:
+      - CADDY_INGRESS_NETWORKS=lms_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - caddy_data:/data
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager # Obrigatório no Swarm
+      replicas: 1
+
+  # --- COMMAND (POST/PUT/DELETE) ---
   books_command:
     image: carloshenriquesisep/lmsbooks:${STABLE_TAG:-v1.0.0}
     environment:
       - SPRING_PROFILES_ACTIVE=command
       - SPRING_DATA_MONGODB_HOST=mongodb
     deploy:
-      endpoint_mode: dnsrr
+      # endpoint_mode: dnsrr # Opcional com Caddy, mas podes manter se preferires
       labels:
-        - "traefik.enable=true"
-        - "traefik.http.services.command-stable.loadbalancer.server.port=8080"
-        - "traefik.docker.network=lms_network"
+        caddy: "lms.localhost"
+
+        # 1. Matcher: Se o método for de escrita...
+        caddy.@command.method: "POST PUT PATCH DELETE"
+
+        # 2. Handler: ...encaminha para este bloco
+        caddy.handle: "@command"
+
+        # 3. Proxy + Canary (90% para este container, 10% para o canary)
+        caddy.handle.reverse_proxy: "{{upstreams 8080}} books_command_canary:8080"
+        caddy.handle.reverse_proxy.lb_policy: "weighted_round_robin 9 1"
     networks:
       - lms_network
 
@@ -22,27 +49,31 @@ services:
       - SPRING_PROFILES_ACTIVE=command
       - SPRING_DATA_MONGODB_HOST=mongodb
     deploy:
-      endpoint_mode: dnsrr
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.services.command-canary.loadbalancer.server.port=8080"
-        - "traefik.docker.network=lms_network"
-
+      # SEM LABELS. Este serviço é "passivo".
+      # O Caddy sabe que ele existe porque o referenciamos no serviço acima.
+      replicas: 1
     networks:
       - lms_network
 
-  # --- QUERY (GET) ---
+  # --- QUERY (GET/HEAD) ---
   books_query:
     image: carloshenriquesisep/lmsbooks:${STABLE_TAG:-v1.0.0}
     environment:
       - SPRING_PROFILES_ACTIVE=query
       - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
     deploy:
-      endpoint_mode: dnsrr
       labels:
-        - "traefik.enable=true"
-        - "traefik.http.services.query-stable.loadbalancer.server.port=8080"
-        - "traefik.docker.network=lms_network"
+        caddy: "lms.localhost"
+
+        # 1. Matcher: Se o método for de leitura...
+        caddy.@query.method: "GET HEAD"
+
+        # 2. Handler: ...encaminha para este bloco
+        caddy.handle: "@query"
+
+        # 3. Proxy + Canary (90% para este container, 10% para o canary)
+        caddy.handle.reverse_proxy: "{{upstreams 8080}} books_query_canary:8080"
+        caddy.handle.reverse_proxy.lb_policy: "weighted_round_robin 9 1"
     networks:
       - lms_network
 
@@ -52,23 +83,27 @@ services:
       - SPRING_PROFILES_ACTIVE=query
       - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
     deploy:
-      endpoint_mode: dnsrr
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.services.query-canary.loadbalancer.server.port=8080"
-        - "traefik.docker.network=lms_network"
+      # SEM LABELS.
+      replicas: 1
     networks:
       - lms_network
 
-  # --- INFRASTRUCTURE (Bases de Dados e Broker) ---
+  # --- INFRASTRUCTURE ---
   postgres:
     image: postgres:latest
     environment: [POSTGRES_PASSWORD=password]
     networks: [lms_network]
+    deploy:
+      replicas: 1
 
   mongodb:
     image: mongo:7
     networks: [lms_network]
+    deploy:
+      replicas: 1
+
+volumes:
+  caddy_data:
 
 networks:
   lms_network:
