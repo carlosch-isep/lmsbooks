@@ -95,10 +95,10 @@ pipeline {
 
         stage("Quality Gate") {
             steps {
-                timeout(time: 5, unit: 'MINUTES') {
+                timeout(time: 1, unit: 'MINUTES') {
                     script {
                         def qg = waitForQualityGate()
-                        if (qg.status != 'OK') {
+                        if (qg.status != 'SUCCESS') {
                             error "Pipeline abortado: O código não passou no Quality Gate. Status: ${qg.status}"
                         }
                     }
