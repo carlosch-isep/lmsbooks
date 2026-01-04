@@ -18,7 +18,7 @@ pipeline {
         )
         choice(
             name: 'DEPLOY_ENV',
-            choices: ['Staging', 'Production'],
+            choices: ['Staging', 'Dev', 'Production'],
             description: 'Select the environment you want'
         )
         choice(
@@ -161,8 +161,10 @@ pipeline {
         stage('k6 Production Load Tests') {
             steps {
                 script {
-                    utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
-                    utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
+                    if(params.DEPLOY_ENV.toLowerCase() == 'dev'){
+                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
+                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8070 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
+                    }
                 }
             }
         }
