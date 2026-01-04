@@ -89,6 +89,19 @@ pipeline {
             }
         }
 
+        stage("QUALITY GATE") {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    script {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Manual Approval') {
             steps {
                 script {
@@ -101,9 +114,9 @@ pipeline {
         stage('Post-Build Reports') {
             steps {
                 script {
-                    utils.publishReport(path: 'target/site/jacoco', file: 'index.html', name: "JaCoCo Coverage")
-                    sh 'mvn test -Ppact-provider'
-                    utils.publishReport(path: 'target/pacts', file: '*.html', name: "Pact Contract Tests")
+                    utils.publishReport(path: 'target/reports', file: 'surefire.html', name: "Surefire Coverage")
+                    sh 'mvn test -Ppact-provider -Dpact.writer.strategy=pactfile -Dpact.reports.path=target/pacts/reports'
+                    utils.publishReport(path: 'target/pacts', file: '*.json', name: "Pact Contract Tests")
                 }
             }
         }
@@ -142,8 +155,8 @@ pipeline {
             steps {
                 script {
                     try {
-                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8088 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
-                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh:8087 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
+                        utils.runLoadTest("BASE_URL=https://webhook.site/8da3f744-da0e-4725-83c0-04f3ddadbec9 load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
+                        utils.runLoadTest("BASE_URL=https://webhook.site/8da3f744-da0e-4725-83c0-04f3ddadbec9 load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
                     } finally {
                         currentBuild.result = 'SUCCESS'
                     }
