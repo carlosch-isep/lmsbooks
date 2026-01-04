@@ -150,7 +150,11 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     script {
-                        containerPush.containerPush("${params.DEPLOY_ENV.toLowerCase()}-${env.BUILD_NUMBER}", DOCKER_USER, DOCKER_PASS)
+                        try {
+                            containerPush.containerPush("${params.DEPLOY_ENV.toLowerCase()}-${env.BUILD_NUMBER}", DOCKER_USER, DOCKER_PASS)
+                        } finally {
+                           echo "success"
+                        }
                     }
                 }
             }
