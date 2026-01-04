@@ -17,7 +17,7 @@ services:
     deploy:
       placement:
         constraints:
-          - node.role == manager # Obrigatório no Swarm
+          - node.role == manager
       replicas: 1
 
   # --- COMMAND (POST/PUT/DELETE) ---
@@ -27,17 +27,15 @@ services:
       - SPRING_PROFILES_ACTIVE=command
       - SPRING_DATA_MONGODB_HOST=mongodb
     deploy:
-      # endpoint_mode: dnsrr # Opcional com Caddy, mas podes manter se preferires
       labels:
-        caddy: "lms.localhost"
+        # CORREÇÃO AQUI: Adicionado "http://" para desativar SSL
+        caddy: "http://lms.localhost"
 
-        # 1. Matcher: Se o método for de escrita...
+        # Matcher para métodos de escrita
         caddy.@command.method: "POST PUT PATCH DELETE"
-
-        # 2. Handler: ...encaminha para este bloco
         caddy.handle: "@command"
 
-        # 3. Proxy + Canary (90% para este container, 10% para o canary)
+        # Proxy + Canary (90% Stable / 10% Canary)
         caddy.handle.reverse_proxy: "{{upstreams 8080}} books_command_canary:8080"
         caddy.handle.reverse_proxy.lb_policy: "weighted_round_robin 9 1"
     networks:
@@ -49,8 +47,6 @@ services:
       - SPRING_PROFILES_ACTIVE=command
       - SPRING_DATA_MONGODB_HOST=mongodb
     deploy:
-      # SEM LABELS. Este serviço é "passivo".
-      # O Caddy sabe que ele existe porque o referenciamos no serviço acima.
       replicas: 1
     networks:
       - lms_network
@@ -63,15 +59,14 @@ services:
       - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
     deploy:
       labels:
-        caddy: "lms.localhost"
+        # CORREÇÃO AQUI: Adicionado "http://" para desativar SSL
+        caddy: "http://lms.localhost"
 
-        # 1. Matcher: Se o método for de leitura...
+        # Matcher para métodos de leitura
         caddy.@query.method: "GET HEAD"
-
-        # 2. Handler: ...encaminha para este bloco
         caddy.handle: "@query"
 
-        # 3. Proxy + Canary (90% para este container, 10% para o canary)
+        # Proxy + Canary (90% Stable / 10% Canary)
         caddy.handle.reverse_proxy: "{{upstreams 8080}} books_query_canary:8080"
         caddy.handle.reverse_proxy.lb_policy: "weighted_round_robin 9 1"
     networks:
@@ -83,7 +78,6 @@ services:
       - SPRING_PROFILES_ACTIVE=query
       - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
     deploy:
-      # SEM LABELS.
       replicas: 1
     networks:
       - lms_network
