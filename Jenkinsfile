@@ -99,7 +99,7 @@ pipeline {
                     sleep 30
                     def response = sh(
                         script: """
-                            curl -s -u ${SONAR_TOKEN}: \
+                            curl -s -u ${SONAR_TOKEN_LMSBOOK}: \
                             'http://lms-isep.ovh:9000/api/qualitygates/project_status?projectKey=lmsbooks'
                         """,
                         returnStdout: true
