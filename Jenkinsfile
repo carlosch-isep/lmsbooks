@@ -83,7 +83,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv('lms') {
                     sh "mvn sonar:sonar -Dsonar.token=${SONAR_TOKEN_LMSBOOK}"
                 }
             }
