@@ -212,9 +212,19 @@ pipeline {
         stage('K6 Smoke tests') {
             steps {
                 script {
-                    if(params.DEPLOY_ENV.toLowerCase() == 'dev' || params.DEPLOY_ENV.toLowerCase() == 'staging'){
-                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
-                        utils.runLoadTest("BASE_URL=http://lms-isep.ovh load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
+                    def ports = [
+                        'staging': 8080,
+                        'dev': 18080
+                    ]
+
+                    def envName = params.DEPLOY_ENV?.toLowerCase()
+
+                    if (envName in ['dev', 'staging']) {
+                        def targetPort = ports[envName]
+                        def baseUrl = "http://lms-isep.ovh:${targetPort}"
+
+                        utils.runLoadTest("BASE_URL=${baseUrl} load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
+                        utils.runLoadTest("BASE_URL=${baseUrl} load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
                     }
                 }
 
