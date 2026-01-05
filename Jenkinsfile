@@ -133,16 +133,19 @@ pipeline {
             steps {
                 script {
                     try {
-                        utils.publishReport(path: 'target/reports', file: 'surefire.html', name: "Surefire Coverage")
-                        sh 'mvn test -Ppact-provider -Dpact.writer.strategy=pactfile -Dpact.reports.path=target/pacts/reports'
-                        utils.publishReport(path: 'target/pacts', file: '*.json', name: "Pact Contract Tests")
-                    } finally {
-                        echo "success"
-                    }
-                }
+                        int status = sh(script: 'mvn test -Ppact-provider -Dpact.writer.strategy=pactfile -Dpact.reports.path=target/pacts/reports', returnStatus: true)
 
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    echo "Post-Build Reports catchError"
+                        if (status != 0) {
+                            currentBuild.result = 'UNSTABLE'
+                        }
+                    } finally {
+                        utils.publishReport(path: 'target/reports', file: 'surefire.html', name: "Surefire Coverage")
+                        if (fileExists('target/pacts/reports/index.html')) {
+                            utils.publishReport(path: 'target/pacts/reports', file: 'index.html', name: "Pact Contract Tests")
+                        } else {
+                         archiveArtifacts artifacts: 'target/pacts/**/*.json', allowEmptyArchive: true
+                     }
+                    }
                 }
             }
         }
