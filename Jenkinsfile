@@ -143,7 +143,7 @@ pipeline {
                         if (fileExists('target/pacts/reports/index.html')) {
                             utils.publishReport(path: 'target/pacts/reports', file: 'index.html', name: "Pact Contract Tests")
                         } else {
-                         archiveArtifacts artifacts: 'target/pacts/**/*.json', allowEmptyArchive: true
+                         archiveArtifacts artifacts: 'target/pacts/*.json', allowEmptyArchive: true
                      }
                     }
                 }
