@@ -44,7 +44,7 @@ pipeline {
             steps {
                 script {
                     utils.sendNotification('#2986cc',
-                    "*Started:* Job ${env.JOB_NAME} [Build #${env.BUILD_NUMBER}] (<${env.BUILD_URL}|Check Console>)")
+                    "*Info:* Started Job ${env.JOB_NAME} [Build #${env.BUILD_NUMBER}] (<${env.BUILD_URL}|Check Console>)")
                 }
             }
         }
@@ -118,7 +118,7 @@ pipeline {
         stage('Manual Approval') {
             steps {
                 script {
-                    utils.sendNotification('#f1c232', "Deploy manual approval needed [Build #${env.BUILD_NUMBER}] (<${env.BUILD_URL}|Check Console>)")
+                    utils.sendNotification('#f1c232', "*Warning:* Deploy manual approval needed [Build #${env.BUILD_NUMBER}] (<${env.BUILD_URL}|Check Console>)")
                 }
                 input message: 'Approve deployment?', ok: 'Go On'
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
@@ -213,7 +213,7 @@ pipeline {
                     }
                 }
 
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                catchError(buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
                     echo "K6 Smoke tests catchError"
                 }
             }
@@ -224,7 +224,7 @@ pipeline {
         always {
             script {
                 try {
-                    utils.sendNotification('#6aa84f', "Deploy with success [Build #${env.BUILD_NUMBER}]!")
+                    utils.sendNotification('#6aa84f', "*Success:* Deploy with success [Build #${env.BUILD_NUMBER}]!")
                 } catch (Exception e) {
                     echo "Post stage Error: ${e.getMessage()}"
                 }
