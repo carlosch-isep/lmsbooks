@@ -118,7 +118,7 @@ pipeline {
         stage('Manual Approval') {
             steps {
                 script {
-                    utils.sendNotification('#f1c232', "Deploy manual approval needed (<${env.BUILD_URL}|Check Console>)")
+                    utils.sendNotification('#f1c232', "Deploy manual approval needed [Build #${env.BUILD_NUMBER}] (<${env.BUILD_URL}|Check Console>)")
                 }
                 input message: 'Approve deployment?', ok: 'Go On'
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
@@ -222,7 +222,13 @@ pipeline {
 
     post {
         always {
-            script { utils.sendNotification('#6aa84f', "Deploy with success!") }
+            script {
+                try {
+                    utils.sendNotification('#6aa84f', "Deploy with success [Build #${env.BUILD_NUMBER}]!")
+                } catch (Exception e) {
+                    echo "Post stage Error: ${e.getMessage()}"
+                }
+            }
         }
     }
 }
