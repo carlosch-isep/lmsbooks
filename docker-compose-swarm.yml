@@ -20,22 +20,20 @@ services:
           - node.role == manager
       replicas: 1
 
-  # --- COMMAND (POST/PUT/DELETE) ---
+  # --- COMMAND (POST/PUT/DELETE) -> PORTA 8088 ---
   books_command:
     image: carloshenriquesisep/lmsbooks:${STABLE_TAG:-v1.0.0}
     environment:
       - SPRING_PROFILES_ACTIVE=command
       - SPRING_DATA_MONGODB_HOST=mongodb
+      - SERVER_PORT=8088
     deploy:
       labels:
         caddy: "http://lms.localhost"
-
-        # Matcher para métodos de escrita
         caddy.@command.method: "POST PUT PATCH DELETE"
         caddy.handle: "@command"
-
-        # Proxy + Canary (90% Stable / 10% Canary)
-        caddy.handle.reverse_proxy: "{{upstreams 8080}} books_command_canary:8080"
+        # books_command_canary:8088
+        caddy.handle.reverse_proxy: "{{upstreams 8088}} books_command_canary:8088"
         caddy.handle.reverse_proxy.lb_policy: "weighted_round_robin 9 1"
     networks:
       - lms_network
@@ -45,26 +43,26 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=command
       - SPRING_DATA_MONGODB_HOST=mongodb
+      - SERVER_PORT=8088
     deploy:
       replicas: 1
     networks:
       - lms_network
 
-  # --- QUERY (GET/HEAD) ---
+  # --- QUERY (GET/HEAD) -> PORTA 8087 ---
   books_query:
     image: carloshenriquesisep/lmsbooks:${STABLE_TAG:-v1.0.0}
     environment:
       - SPRING_PROFILES_ACTIVE=query
       - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
+      - SERVER_PORT=8087
     deploy:
       labels:
         caddy: "http://lms.localhost"
-
         caddy.@query.method: "GET HEAD"
         caddy.handle: "@query"
-
-        # Proxy + Canary (90% Stable / 10% Canary)
-        caddy.handle.reverse_proxy: "{{upstreams 8080}} books_query_canary:8080"
+        # books_query_canary:8087
+        caddy.handle.reverse_proxy: "{{upstreams 8087}} books_query_canary:8087"
         caddy.handle.reverse_proxy.lb_policy: "weighted_round_robin 9 1"
     networks:
       - lms_network
@@ -74,6 +72,7 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=query
       - spring.datasource.url=jdbc:postgresql://postgres:5432/postgres
+      - SERVER_PORT=8087
     deploy:
       replicas: 1
     networks:
