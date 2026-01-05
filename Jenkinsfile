@@ -72,14 +72,16 @@ pipeline {
         stage('Mutation tests') {
             steps {
                 script {
-                    try {
-                        sh 'mvn org.pitest:pitest-maven:mutationCoverage'
-                    } finally {
-                        utils.publishReport(
-                            path: 'target/pit-reports',
-                            file: 'index.html',
-                            name: "Mutation Tests (PIT)"
-                        )
+                    if(params.DEPLOY_ENV.toLowerCase() == 'dev'){
+                       try {
+                           sh 'mvn org.pitest:pitest-maven:mutationCoverage'
+                       } finally {
+                           utils.publishReport(
+                               path: 'target/pit-reports',
+                               file: 'index.html',
+                               name: "Mutation Tests (PIT)"
+                           )
+                       }
                     }
                 }
             }
