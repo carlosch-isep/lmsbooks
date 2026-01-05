@@ -223,8 +223,8 @@ pipeline {
                         def targetPort = ports[envName]
                         def baseUrl = "http://lms-isep.ovh:${targetPort}"
 
-                        utils.runLoadTest("BASE_URL=${baseUrl} load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
-                        utils.runLoadTest("BASE_URL=${baseUrl} load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
+                        utils.runLoadTest("BASE_URL='${baseUrl}' load-tests/smoke/get-books-smoke.js", 'K6 Smoke Get Books Report')
+                        utils.runLoadTest("BASE_URL='${baseUrl}' load-tests/smoke/create-book-smoke.js", 'K6 Smoke Post Books Report')
                     }
                 }
 
