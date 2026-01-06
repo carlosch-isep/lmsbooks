@@ -29,7 +29,7 @@ services:
       - SERVER_PORT=8088
     deploy:
       labels:
-        caddy: "http://lms.localhost"
+        caddy: "http://lms-isep.ovh"
         caddy.@command.method: "POST PUT PATCH DELETE"
         caddy.handle: "@command"
         # books_command_canary:8088
@@ -58,7 +58,7 @@ services:
       - SERVER_PORT=8087
     deploy:
       labels:
-        caddy: "http://lms.localhost"
+        caddy: "http://lms-isep.ovh"
         caddy.@query.method: "GET HEAD"
         caddy.handle: "@query"
         # books_query_canary:8087
